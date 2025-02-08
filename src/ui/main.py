@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from typing import Literal
 
 
 class App(tk.Tk):
@@ -18,8 +19,13 @@ class App(tk.Tk):
 
         self.create_menu()
 
-    def menu_item_selected(self, *args):
-        print(self.selected_menu_option.get(), args)
+    def menu_item_selected(self, *_):
+        selected_option = self.selected_menu_option.get()
+
+        if selected_option == "Exit":
+            self.quit()
+        elif selected_option == "Application":
+            self.show_app_information()
 
     def create_menu(self) -> None:
         frame = tk.Frame(self, height=40, padx=10, pady=10, bg="#0d6efd")
@@ -44,9 +50,7 @@ class App(tk.Tk):
         processes_button.place(x=100, y=0)
 
         help_button = tk.Button(frame, text="Help")
-        help_button.bind(
-            "<Button-1>", self.show_help_window
-        )
+        help_button.bind("<Button-1>", self.show_help_window)
         help_button.place(x=320, y=0)
 
     def create_menu_button(
@@ -65,23 +69,53 @@ class App(tk.Tk):
         return menu_button
 
     def show_help_window(self, _: tk.Event) -> None:
-        # displays a dialog box with help information
-        help_window = tk.Toplevel(self)
-        help_window.title("Help")
-        help_window.geometry("400x400")
-        help_window.resizable(False, False)
+        title = "Help"
+        description = (
+            "Contact Information\n"
+            "Name\tGitHub Username\n"
+            "Yeison Liscano\tYeisonAndreyLiCe\n"
+            "Juan Angel\tJuanPabloAngelZuleta\n"
+            "Oscar Rojas\tOkarRojas\n"
+        )
+        self.show_information(title, description, "left")
 
-        help_text = tk.Text(help_window, wrap=tk.WORD)
-        help_text.pack(fill=tk.BOTH, expand=True)
+    def show_app_information(self) -> None:
+        title = "Payment Manager"
+        description = (
+            "Version 1.0\n"
+            "Payment Manager is an application designed to "
+            "manage subscriptions to service or product plans."
+            "The solution focuses on four key aspects: allowing "
+            "users to subscribe to plans, enrolling payment methods, "
+            "paying for subscriptions, changing payment methods for "
+            "subscriptions, and deleting subscriptions. The processing "
+            "of transactions, as well as the storage of credit card and "
+            "credit card information, will be the responsibility of the "
+            "payment gateways, the integration of which can be configured "
+            "by the system administrator\n"
+        )
+        self.show_information(title, description)
 
-        help_text.insert(tk.END, "Contact Information\n")
-        # create a table with two columns name ang gitHub username
-        help_text.insert(tk.END, "Name\tGitHub Username\n")
-        help_text.insert(tk.END, "Yeison Liscano\tYeisonAndreyLiCe\n")
-        help_text.insert(tk.END, "Juan Angel\tJuanPabloAngelZuleta\n")
-        help_text.insert(tk.END, "Oscar Rojas\tOkarRojas\n")
+    def show_information(
+        self,
+        title: str,
+        description: str,
+        justify: Literal["left", "right", "center"] = "center",
+    ) -> None:
+        app_information_window = tk.Toplevel(self)
+        app_information_window.title(title)
+        app_information_window.geometry("400x400")
+        app_information_window.resizable(False, False)
 
-        close_button = tk.Button(help_window, text="Close", command=help_window.destroy)
+        app_information_text = tk.Text(app_information_window, wrap=tk.WORD)
+        app_information_text.pack(fill=tk.BOTH, expand=True, pady=10, padx=10)
+        app_information_text.tag_configure(justify, justify=justify)
+        app_information_text.insert(tk.END, description, justify)
+        app_information_text.config(state=tk.DISABLED)
+
+        close_button = tk.Button(
+            app_information_window, text="Close", command=app_information_window.destroy
+        )
         close_button.pack(pady=10)
 
     def run(self):
