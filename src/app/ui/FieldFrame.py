@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..app_management.exceptions import InvalidInputType, InputValueNotProvided
+from ..classes.exceptions import InvalidInputType, InputValueNotProvided
 from .Input import Input
 
 from collections.abc import Callable

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..app_management.exceptions import InvalidInputType, InputValueNotProvided
+from ..classes.exceptions import InvalidInputType, InputValueNotProvided
 
 from dataclasses import dataclass
 from tkinter import Entry

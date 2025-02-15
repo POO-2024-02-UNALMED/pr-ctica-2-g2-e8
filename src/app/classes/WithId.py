@@ -1,12 +1,9 @@
 class WithId:
-    def __init__(self, id):
+    def __init__(self, id: str):
         self.id = id
 
-    def get_id(self):
+    def get_id(self) -> str:
         return self.id
-
-    def set_id(self, id):
-        self.id = id
 
     """
     @staticmethod
