@@ -44,7 +44,7 @@ class FieldFrame(Frame):
             entry.grid(row=i+2, column=1, sticky="w")
             if input_value := input.get_value():
                 entry.insert(0, str(input_value))
-            entry.config(state="disable" if input.is_disabled() else "normal")
+            entry.config(state="disabled" if input.is_disabled() else "normal")
 
             self._entries.append(entry)
             input.set_entry_ref(entry)
@@ -74,7 +74,8 @@ class FieldFrame(Frame):
 
     def handle_reset(self, _: Event[Button]) -> Button:
         for entry in self._entries:
-            entry.delete(0, "end")
+            if entry["state"] != "disabled":
+                entry.delete(0, "end")
 
         return self._reset_button
 
