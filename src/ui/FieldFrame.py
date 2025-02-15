@@ -1,6 +1,10 @@
 from __future__ import annotations
-from tkinter import Frame, Label, Entry
+
+from ..app_management.exceptions import InvalidInputType, InputValueNotProvided
 from .Input import Input
+
+from collections.abc import Callable
+from tkinter import Frame, Label, Entry, Button, Event, messagebox
 
 class FieldFrame(Frame):
     def __init__(
@@ -15,6 +19,10 @@ class FieldFrame(Frame):
         self._inputs_title = inputs_title
         self._inputs = inputs
         self._entries: list[Entry] = []
+        self._submit_button: Button | None = None
+        self._reset_button: Button | None = None
+        self.create_grid()
+        self.add_submit_and_reset_buttons(self.handle_submit, self.handle_reset)
 
     def create_grid(self) -> None:
         Label(
@@ -41,6 +49,43 @@ class FieldFrame(Frame):
             self._entries.append(entry)
             input.set_entry_ref(entry)
 
+    def add_submit_and_reset_buttons(
+        self,
+        submit_command: Callable[[Event[Button]], object],
+        reset_command: Callable[[Event[Button]], object]
+    ) -> None:
+        submit_button = Button(
+            self,
+            text="Submit",
+            bg="white"
+        )
+        submit_button.bind("<Button-1>", lambda e: submit_command(e))
+        self._submit_button = submit_button
+        submit_button.grid(row=len(self._inputs)+2, column=0, sticky="w")
+
+        reset_button = Button(
+            self,
+            text="Reset",
+            bg="white"
+        )
+        reset_button.bind("<Button-1>", lambda e: reset_command(e))
+        self._reset_button = reset_button
+        reset_button.grid(row=len(self._inputs)+2, column=1, sticky="w")
+
+    def handle_reset(self, _: Event[Button]) -> Button:
+        for entry in self._entries:
+            entry.delete(0, "end")
+
+        return self._reset_button
+
+    def handle_submit(self, _: Event[Button]) -> Button:
+        for input in self._inputs:
+            try:
+                input.set_value()
+            except (InputValueNotProvided, InvalidInputType) as e:
+                messagebox.showerror("Error", str(e))
+
+        return self._submit_button
 
     def get_values(self) -> tuple[tuple[str, str | int | float | None], ...]:
         return tuple(input.get_label_value_pair() for input in self._inputs)

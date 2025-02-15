@@ -1,6 +1,9 @@
 from __future__ import annotations
-from tkinter import Entry
+
+from ..app_management.exceptions import InvalidInputType, InputValueNotProvided
+
 from dataclasses import dataclass
+from tkinter import Entry
 from typing import Literal
 
 TValue = Literal["str", "int", "float"]
@@ -51,7 +54,7 @@ class Input():
     def validate(self) -> Input:
         if self._required and self._value is None:
             self.is_valid = False
-            raise ValueError("Value is required")
+            raise InputValueNotProvided(self._label)
         try:
             if self._value_type == "str":
                 self.is_valid = isinstance(self._value, str)
@@ -62,4 +65,6 @@ class Input():
             return self
         except ValueError:
             self.is_valid = False
-            raise ValueError(f"Value should be of type {self.value_type}")
+            raise InvalidInputType(
+                f"Value of {self._label} should be of type {self.value_type}"
+            )
