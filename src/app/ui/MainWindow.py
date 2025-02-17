@@ -3,13 +3,16 @@ from tkinter import ttk, messagebox
 from typing import Literal
 from collections.abc import Callable
 
+from app.ui.Input import Input
+from app.ui.FieldFrame import FieldFrame
+
 
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
         style = ttk.Style()
         style.theme_use("aqua")
-        self.geometry("720x720")
+        self.geometry("450x450")
         self.title("Payment Manager")
 
         self.create_menu()
@@ -89,7 +92,24 @@ class MainWindow(tk.Tk):
                     self.quit()
         return _list_processes
 
-    def show_add_credit_card_form(self) -> None:...
+    def show_add_credit_card_form(self) -> None:
+        field_frame = FieldFrame(
+            self,
+            "Add Credit Card",
+            (
+                "Please enter the following"
+                "information to add a new credit card"
+            ),
+            "Add Credit Card",
+            "Credit Card Information",
+            (
+                Input("Card Number", "int"),
+                Input("Expiration Date", "str"),
+                Input("Security Code", "int"),
+                Input("Card Holder Name", "str"),
+            )
+        )
+        field_frame.grid(row=0, column=0)
     def show_add_subscription_form(self) -> None:...
     def show_change_payment_method_form(self) -> None:...
     def show_inactivate_plan_form(self) -> None:...
