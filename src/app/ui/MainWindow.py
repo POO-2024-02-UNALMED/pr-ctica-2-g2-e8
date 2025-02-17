@@ -10,8 +10,6 @@ from app.ui.FieldFrame import FieldFrame
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
-        style = ttk.Style()
-        style.theme_use("aqua")
         self.geometry("450x450")
         self.title("Payment Manager")
 
