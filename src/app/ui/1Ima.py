@@ -1,12 +1,25 @@
 import tkinter as tk
 from tkinter import ttk
 count = 0
-
+count2 = 0
 def on_enter(event):
-    baner.config(file=r"src\ui\images\baner2.png")  # Cambia el fondo al pasar el mouse
+    global count2
+    if count2 == 0:
+        baner.config(file=r"src\app\ui\images\baner2.png")  # Cambia el fondo al pasar el mouse
+        count2 = 1
+    elif count2 == 1:
+        baner.config(file=r"src\app\ui\images\baner3.png")
+        count2 = 2
+    elif count2 == 2:
+        baner.config(file=r"src\app\ui\images\baner4.png")
+        count2 = 3
+    elif count2 == 3:   
+        baner.config(file=r"src\app\ui\images\baner5.png")
+        count2 = 4
+    elif count2 == 4:
+        baner.config(file=r"src\app\ui\images\baner1.png")
+        count2 = 0
 
-def on_leave(event):
-    baner.config(file=r"src\ui\images\baner1.png")  # Restaura el fondo original
 
 def hojadevida(evento):
 
@@ -14,26 +27,26 @@ def hojadevida(evento):
        
     if count == 0:
         button.config(text="Yeison Andrey Liscano Ceballes", bg="blue")
-        image.config(file="src/ui/images/yeison_liscano.png")
-        image2.config(file="src/ui/images/yeison_liscano_2.png")
-        image3.config(file="src/ui/images/yeison_liscano_3.png")
-        image4.config(file="src/ui/images/yeison_liscano_4.png")
+        image.config(file=r"src\app\ui\images\yeison_liscano.png")
+        image2.config(file=r"src\app\ui\images\yeison_liscano_2.png")
+        image3.config(file=r"src\app\ui\images\yeison_liscano_3.png")
+        image4.config(file=r"src\app\ui\images\yeison_liscano_4.png")
         count = 1
         
     elif count == 1:
         button.config(text="Juan Pablo Angel Zuleta", bg="red")
-        image.config(file="src/ui/images/juan_angel_1.png")
-        image2.config(file="src/ui/images/juan_angel_2.png")
-        image3.config(file="src/ui/images/juan_angel_3.png")
-        image4.config(file="src/ui/images/juan_angel_4.png")
+        image.config(file=r"src\app\ui\images\juan_angel_1.png")
+        image2.config(file=r"src\app\ui\images\juan_angel_2.png")
+        image3.config(file=r"src\app\ui\images\juan_angel_3.png")
+        image4.config(file=r"src\app\ui\images\juan_angel_4.png")
         count = 2
         
     elif count == 2:
         button.config(text="Oscar Fabian Rojas Baquero\n19 años\nciencias de la computacion\nMaestro pokemon", bg="gray")
-        image.config(file="src/ui/images/images(2).png")
-        image2.config(file="src/ui/images/images(1).png")
-        image3.config(file="src/ui/images/descarga.png")
-        image4.config(file="src/ui/images/images.png")
+        image.config(file=r"src\app\ui\images\descarga.png")
+        image2.config(file=r"src\app\ui\images\images.png")
+        image3.config(file=r"src\app\ui\images\images(1).png")
+        image4.config(file=r"src\app\ui\images\images(2).png")
         count = 0
             
 
@@ -76,19 +89,19 @@ label.pack(fill="both", expand=True)
 frameima = tk.Frame(frame1)
 frameima.place(relx=0, rely=.4, relwidth=1, relheight=.6)
 
-image = tk.PhotoImage(file="src/ui/images/images.png")
+image = tk.PhotoImage(file=r"src\app\ui\images\descarga.png")
 label = ttk.Label(frameima, image=image, background="black")
 label.grid(column=0, row=0,sticky="nsew")
 
-image2 = tk.PhotoImage(file="src/ui/images/descarga.png")
+image2 = tk.PhotoImage(file=r"src\app\ui\images\images.png")
 label2 = ttk.Label(frameima, image=image2, background="black")
 label2.grid(column=1, row=0,sticky="nsew")
 
-image3 = tk.PhotoImage(file="src/ui/images/images(1).png")
+image3 = tk.PhotoImage(file=r"src\app\ui\images\images(1).png")
 label3 = ttk.Label(frameima, image=image3, background="black")
 label3.grid(column=0, row=1,sticky="nsew")
 
-image4 = tk.PhotoImage(file="src/ui/images/images(2).png")
+image4 = tk.PhotoImage(file=r"src\app\ui\images\images(2).png")
 label4 = ttk.Label(frameima, image=image4, background="black")
 label4.grid(column=1, row=1,sticky="nsew")
 
@@ -96,12 +109,11 @@ for i in range(2):
     frameima.rowconfigure(i, weight=1)
     frameima.columnconfigure(i, weight=1)
 
-baner = tk.PhotoImage(file="src/ui/images/baner1.png")
+baner = tk.PhotoImage(file=r"src\app\ui\images\baner1.png")
 button4 = tk.Label(frame6, image=baner)
 button4.pack(fill="both", expand=True)
 
 # Asociamos los eventos <Enter> y <Leave> al botón
 button4.bind("<Enter>", on_enter)
-button4.bind("<Leave>", on_leave)
 
 root.mainloop()
