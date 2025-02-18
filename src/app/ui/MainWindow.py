@@ -1,9 +1,8 @@
+from app.ui import Input, FieldFrame
+
+from collections.abc import Callable
 from tkinter import messagebox, Tk, Menu
 from typing import Literal
-from collections.abc import Callable
-
-from app.ui.Input import Input
-from app.ui.FieldFrame import FieldFrame
 
 
 class MainWindow(Tk):
@@ -34,11 +33,9 @@ class MainWindow(Tk):
         )
         for functionality in functionalities:
             process_menu.add_command(
-                label=functionality,
-                command=self.list_processes(functionality)
+                label=functionality, command=self.list_processes(functionality)
             )
         menu_bar.add_cascade(label="Processes and Queries", menu=process_menu)
-
 
         help_menu = Menu(menu_bar)
         help_menu.add_command(label="About", command=self.show_about_info)
@@ -59,20 +56,20 @@ class MainWindow(Tk):
                 "credit card information, will be the responsibility of the "
                 "payment gateways, the integration of which can be configured "
                 "by the system administrator\n"
-            )
+            ),
         )
 
     def list_processes(
-            self,
-            process: Literal[
-                "Add subscription",
-                "Add credit card",
-                "Change subscription paying method",
-                "Inactivate plan",
-                "Pay subscription",
-                "Exit"
-            ]
-        ) -> Callable[[], None]:
+        self,
+        process: Literal[
+            "Add subscription",
+            "Add credit card",
+            "Change subscription paying method",
+            "Inactivate plan",
+            "Pay subscription",
+            "Exit",
+        ],
+    ) -> Callable[[], None]:
         def _list_processes() -> None:
             match process:
                 case "Add subscription":
@@ -87,16 +84,14 @@ class MainWindow(Tk):
                     self.show_pay_subscription_form()
                 case "Exit":
                     self.quit()
+
         return _list_processes
 
     def show_add_credit_card_form(self) -> None:
         field_frame = FieldFrame(
             self,
             "Add Credit Card",
-            (
-                "Please enter the following"
-                "information to add a new credit card"
-            ),
+            ("Please enter the followinginformation to add a new credit card"),
             "Add Credit Card",
             "Credit Card Information",
             (
@@ -104,13 +99,14 @@ class MainWindow(Tk):
                 Input("Expiration Date", "str"),
                 Input("Security Code", "int"),
                 Input("Card Holder Name", "str"),
-            )
+            ),
         )
         field_frame.grid(row=0, column=0)
-    def show_add_subscription_form(self) -> None:...
-    def show_change_payment_method_form(self) -> None:...
-    def show_inactivate_plan_form(self) -> None:...
-    def show_pay_subscription_form(self) -> None:...
+
+    def show_add_subscription_form(self) -> None: ...
+    def show_change_payment_method_form(self) -> None: ...
+    def show_inactivate_plan_form(self) -> None: ...
+    def show_pay_subscription_form(self) -> None: ...
 
     def show_about_info(self) -> None:
         messagebox.showinfo(
@@ -121,9 +117,8 @@ class MainWindow(Tk):
                 "Yeison Liscano - YeisonAndreyLiCe\n"
                 "Juan Angel     - JuanPabloAngelZuleta\n"
                 "Oscar Rojas    - OkarRojas\n"
-            )
+            ),
         )
 
     def run(self) -> None:
         self.mainloop()
-

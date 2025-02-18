@@ -1,4 +1,4 @@
-from app.ui.MainWindow import MainWindow
+from app.ui import MainWindow
 
 window = MainWindow()
 window.run()

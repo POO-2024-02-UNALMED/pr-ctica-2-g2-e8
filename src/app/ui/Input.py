@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..classes.exceptions import InvalidInputType, InputValueNotProvided
+from app.classes.exceptions import InvalidInputType, InputValueNotProvided
 
 from dataclasses import dataclass
 from tkinter import Entry
@@ -8,8 +8,9 @@ from typing import Literal
 
 TValue = Literal["str", "int", "float"]
 
+
 @dataclass
-class Input():
+class Input:
     _label: str
     _value_type: TValue
     _required: bool = True
@@ -21,8 +22,8 @@ class Input():
 
     def set_value(self) -> None:
         """
-          Will raise ValueError if value is
-          required and not set or if value is not of the correct type
+        Will raise ValueError if value is
+        required and not set or if value is not of the correct type
         """
         if not self.validate()._is_valid and self._error:
             raise self._error
@@ -78,4 +79,3 @@ class Input():
                 f"Value of {self._label} should be of type {self._value_type}"
             )
         return self
-
