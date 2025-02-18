@@ -1,4 +1,5 @@
 from app.ui import MainWindow
 
-window = MainWindow()
-window.run()
+if __name__ == "__main__":
+    window = MainWindow()
+    window.run()

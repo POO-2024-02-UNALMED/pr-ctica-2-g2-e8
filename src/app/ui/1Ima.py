@@ -1,7 +1,18 @@
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
+
 import tkinter as tk
 from tkinter import ttk
+import main
+
 count = 0
 count2 = 0
+
+def ventana2(event):    
+    root.destroy()
+    window = main.MainWindow()
+    window.run()
 def on_enter(event):
     global count2
     if count2 == 0:
@@ -20,11 +31,8 @@ def on_enter(event):
         baner.config(file=r"src\app\ui\images\baner1.png")
         count2 = 0
 
-
 def hojadevida(evento):
-
     global count
-       
     if count == 0:
         button.config(text="Yeison Andrey Liscano Ceballes", bg="blue")
         image.config(file=r"src\app\ui\images\yeison_liscano.png")
@@ -32,7 +40,6 @@ def hojadevida(evento):
         image3.config(file=r"src\app\ui\images\yeison_liscano_3.png")
         image4.config(file=r"src\app\ui\images\yeison_liscano_4.png")
         count = 1
-        
     elif count == 1:
         button.config(text="Juan Pablo Angel Zuleta", bg="red")
         image.config(file=r"src\app\ui\images\juan_angel_1.png")
@@ -40,7 +47,6 @@ def hojadevida(evento):
         image3.config(file=r"src\app\ui\images\juan_angel_3.png")
         image4.config(file=r"src\app\ui\images\juan_angel_4.png")
         count = 2
-        
     elif count == 2:
         button.config(text="Oscar Fabian Rojas Baquero\n19 años\nciencias de la computacion\nMaestro pokemon", bg="gray")
         image.config(file=r"src\app\ui\images\descarga.png")
@@ -48,12 +54,11 @@ def hojadevida(evento):
         image3.config(file=r"src\app\ui\images\images(1).png")
         image4.config(file=r"src\app\ui\images\images(2).png")
         count = 0
-            
 
 root = tk.Tk()
 root.title("Pyment Manager")
 root.geometry("520x435")
-root.configure(bg="gray")
+root.configure(bg="#001058")
 
 button = tk.Button(root, text="Inicio")
 button.pack(side="top", anchor="w")
@@ -82,6 +87,7 @@ button.bind("<Button-1>", hojadevida)
 
 button2 = tk.Button(frame5, text="Da clik para ingreasar al sistema", bg="white", fg="black")
 button2.pack(fill="both", expand=True)
+button2.bind("<Button-1>", ventana2)
 
 label = tk.Label(frame3, text="Hola Bienvenido \n a nuestro gestor", bg="white", fg="black")
 label.pack(fill="both", expand=True)
