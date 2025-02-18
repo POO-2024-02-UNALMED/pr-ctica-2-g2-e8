@@ -8,5 +8,5 @@ class WithId:
         return self.id
 
     @staticmethod
-    def create_id(attribute1, attribute2):
+    def create_id(attribute1: str, attribute2: str) -> str:
         return hashlib.sha1((attribute1 + attribute2).encode()).hexdigest()

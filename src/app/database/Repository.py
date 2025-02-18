@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from app.classes.WithId import WithId
+from app.classes import WithId
 
 import os
 import pickle

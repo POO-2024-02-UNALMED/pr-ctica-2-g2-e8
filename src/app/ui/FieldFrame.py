@@ -63,7 +63,7 @@ class FieldFrame(Frame):
             padx=FieldFrame._GAP,
         )
         self.create_grid()
-        self.add_submit_and_reset_buttons(self.handle_submit, self.handle_reset)
+        self.add_submit_and_reset_buttons(self._handle_submit, self._handle_reset)
 
     def create_grid(self) -> None:
         Label(
@@ -155,14 +155,14 @@ class FieldFrame(Frame):
         self._reset_button = reset_button
         reset_button.grid(row=0, column=1, sticky="nsew")
 
-    def handle_reset(self, _: Event[Button]) -> Button:
+    def _handle_reset(self, _: Event[Button]) -> Button:
         for entry in self._entries:
             if entry["state"] != "disabled":
                 entry.delete(0, "end")
 
         return self._reset_button
 
-    def handle_submit(self, _: Event[Button]) -> Button:
+    def _handle_submit(self, _: Event[Button]) -> Button:
         for input in self._inputs:
             try:
                 input.set_value()

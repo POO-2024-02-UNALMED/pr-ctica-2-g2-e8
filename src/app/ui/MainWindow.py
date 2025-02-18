@@ -1,5 +1,4 @@
-import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import messagebox, Tk, Menu
 from typing import Literal
 from collections.abc import Callable
 
@@ -7,24 +6,24 @@ from app.ui.Input import Input
 from app.ui.FieldFrame import FieldFrame
 
 
-class MainWindow(tk.Tk):
-    def __init__(self):
+class MainWindow(Tk):
+    def __init__(self) -> None:
         super().__init__()
         self.geometry("450x450")
         self.title("Payment Manager")
 
         self.create_menu()
 
-    def create_menu(self):
-        menu_bar = tk.Menu(self)
+    def create_menu(self) -> None:
+        menu_bar = Menu(self)
         self.config(menu=menu_bar)
 
-        file_menu = tk.Menu(menu_bar)
+        file_menu = Menu(menu_bar)
         file_menu.add_command(label="App", command=self.show_application_info)
         file_menu.add_command(label="Exit", command=self.quit)
         menu_bar.add_cascade(label="File", menu=file_menu)
 
-        process_menu = tk.Menu(menu_bar)
+        process_menu = Menu(menu_bar)
         functionalities = (
             "Add subscription",
             "Add credit card",
@@ -41,11 +40,11 @@ class MainWindow(tk.Tk):
         menu_bar.add_cascade(label="Processes and Queries", menu=process_menu)
 
 
-        help_menu = tk.Menu(menu_bar)
+        help_menu = Menu(menu_bar)
         help_menu.add_command(label="About", command=self.show_about_info)
         menu_bar.add_cascade(label="Help", menu=help_menu)
 
-    def show_application_info(self):
+    def show_application_info(self) -> None:
         messagebox.showinfo(
             "Payment Manager",
             (
@@ -113,7 +112,7 @@ class MainWindow(tk.Tk):
     def show_inactivate_plan_form(self) -> None:...
     def show_pay_subscription_form(self) -> None:...
 
-    def show_about_info(self):
+    def show_about_info(self) -> None:
         messagebox.showinfo(
             "About",
             (
@@ -125,6 +124,6 @@ class MainWindow(tk.Tk):
             )
         )
 
-    def run(self):
+    def run(self) -> None:
         self.mainloop()
 
