@@ -34,21 +34,21 @@ def on_enter(event):
 def hojadevida(evento):
     global count
     if count == 0:
-        button.config(text="Yeison Andrey Liscano Ceballes", bg="blue")
+        button.config(text="Yeison Andrey Liscano Ceballes\n23 Años\nCiencias De La Computacion", bg="blue")
         image.config(file=r"src\app\ui\images\yeison_liscano.png")
         image2.config(file=r"src\app\ui\images\yeison_liscano_2.png")
         image3.config(file=r"src\app\ui\images\yeison_liscano_3.png")
         image4.config(file=r"src\app\ui\images\yeison_liscano_4.png")
         count = 1
     elif count == 1:
-        button.config(text="Juan Pablo Angel Zuleta", bg="red")
+        button.config(text="Juan Pablo Angel Zuleta\n19 Años\nIngenieria de sistemas", bg="red")
         image.config(file=r"src\app\ui\images\juan_angel_1.png")
         image2.config(file=r"src\app\ui\images\juan_angel_2.png")
         image3.config(file=r"src\app\ui\images\juan_angel_3.png")
         image4.config(file=r"src\app\ui\images\juan_angel_4.png")
         count = 2
     elif count == 2:
-        button.config(text="Oscar Fabian Rojas Baquero\n19 años\nciencias de la computacion\nMaestro pokemon", bg="gray")
+        button.config(text="Oscar Fabian Rojas Baquero\n19 años\nciencias De La Computacion\nMaestro pokemon", bg="gray", )
         image.config(file=r"src\app\ui\images\descarga.png")
         image2.config(file=r"src\app\ui\images\images.png")
         image3.config(file=r"src\app\ui\images\images(1).png")
@@ -58,9 +58,9 @@ def hojadevida(evento):
 root = tk.Tk()
 root.title("Pyment Manager")
 root.geometry("520x435")
-root.configure(bg="#001058")
+root.configure(bg="#4682B4")
 
-button = tk.Button(root, text="Inicio")
+button = tk.Button(root, text="Inicio", padx=50, pady=5, bg="#000080", fg="white", font=("roboto", 10))
 button.pack(side="top", anchor="w")
 
 frame1 = tk.Frame(root, bg="red", width=300, height=200)
@@ -81,15 +81,15 @@ frame5.place(relx=0, rely=.7, relwidth=1, relheight=.3)
 frame6 = tk.Frame(frame2, bg="yellow")
 frame6.place(relx=0, rely=.4, relwidth=1, relheight=.3)
 
-button = tk.Button(frame4, text="Oscar Fabian Rojas Baquero\n19 años\nciencias de la computacion\nMaestro pokemon", bg="gray", fg="white")
+button = tk.Button(frame4, text="Oscar Fabian Rojas Baquero\n19 años\nciencias de la computacion\nMaestro pokemon", bg="gray", fg="white", font=("roboto", 10))
 button.pack(fill="both", expand=True)
 button.bind("<Button-1>", hojadevida)
 
-button2 = tk.Button(frame5, text="Da clik para ingreasar al sistema", bg="white", fg="black")
+button2 = tk.Button(frame5, text="Da clik\npara ingreasar al sistema", bg="#5F9EA0", fg="black", font=("roboto", 13))
 button2.pack(fill="both", expand=True)
 button2.bind("<Button-1>", ventana2)
 
-label = tk.Label(frame3, text="Hola Bienvenido \n a nuestro gestor", bg="white", fg="black")
+label = tk.Label(frame3, text="Hola Bienvenido\na nuestro gestor!!", bg="#DEB887", fg="black", font=("roboto", 19))
 label.pack(fill="both", expand=True)
 
 frameima = tk.Frame(frame1)
