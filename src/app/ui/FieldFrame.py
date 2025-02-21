@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from app.classes.exceptions import InvalidInputType, InputValueNotProvided
+from app.classes.exceptions import AppException
 from app.ui import Input
 
 from collections.abc import Callable
@@ -165,7 +165,7 @@ class FieldFrame(Frame):
         for input in self._inputs:
             try:
                 input.set_value()
-            except (InputValueNotProvided, InvalidInputType) as e:
+            except AppException as e:
                 messagebox.showerror("Error", str(e))
                 break
 

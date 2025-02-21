@@ -1,23 +1,31 @@
 from __future__ import annotations
 
-from app.classes.exceptions import InvalidInputType, InputValueNotProvided
+from app.classes.exceptions import (
+    InvalidInputType,
+    InputValueNotProvided,
+    LengthException,
+    NoInRange,
+    AppException,
+)
 
 from dataclasses import dataclass
 from tkinter import Entry
-from typing import Literal
 
-TValue = Literal["str", "int", "float"]
+from collections.abc import Callable
+
+TValue = type[str] | type[int] | type[float]
+TInputType = int | float | str | None
 
 
 @dataclass
-class Input:
+class Input[T]:
     _label: str
-    _value_type: TValue
+    _value_type: TValue = str
     _required: bool = True
     _disable: bool = False
-    _value: str | int | float | None = None
+    _value: T | None = None
+    _validations: tuple[Callable[[T], Callable[[str], AppException | None]], ...] = None
     _entry_ref: Entry | None = None
-    _is_valid: bool = True
     _error: Exception | None = None
 
     def set_value(self) -> None:
@@ -25,20 +33,20 @@ class Input:
         Will raise ValueError if value is
         required and not set or if value is not of the correct type
         """
-        if not self.validate()._is_valid and self._error:
-            raise self._error
-
-        if self._entry_ref:
-            self._value = self._cast_to_value_type(self._entry_ref.get())
+        self._value = self.validate()
+        if self._validations:
+            for validation in self._validations:
+                if error := validation(self._value)(self._label):
+                    raise error
 
     def set_entry_ref(self, entry: Entry) -> Input:
         self._entry_ref = entry
         return self
 
-    def get_value(self) -> str | int | float | None:
+    def get_value(self) -> TInputType:
         return self._value
 
-    def get_label_value_pair(self) -> tuple[str, str | int | float | None]:
+    def get_label_value_pair(self) -> tuple[str, TInputType]:
         return self._label, self._value
 
     def get_label(self) -> str:
@@ -47,35 +55,52 @@ class Input:
     def is_disabled(self) -> bool:
         return self._disable
 
-    def _cast_to_value_type(self, value) -> str | int | float | None:
+    def _cast_to_value_type(self, value: str | None) -> TInputType:
         try:
-            if self._value_type == "str":
+            if self._value_type is str:
                 return str(value)
-            elif self._value_type == "int":
+            elif self._value_type is int:
                 return int(value)
-            elif self._value_type == "float":
+            elif self._value_type is float:
                 return float(value)
         except ValueError:
-            self._is_valid = False
             raise InvalidInputType(
-                f"Value of {self._label} should be of type {self.value_type}"
+                f"Value of {self._label} should be of type {self._value_type.__name__}"
             )
-        return None
+        return value
 
-    def validate(self) -> Input:
-        if self._required and self._value is None:
-            self._is_valid = False
-            self._error = InputValueNotProvided(self._label)
+    def validate(self) -> TInputType:
+        value = self._entry_ref.get() if self._entry_ref else self._value
+        if self._required and value is None:
+            raise InputValueNotProvided(self._label)
 
-        if self._value_type == "str":
-            self._is_valid = isinstance(self._value, str)
-        elif self._value_type == "int":
-            self._is_valid = isinstance(self._value, int)
-        elif self._value_type == "float":
-            self._is_valid = isinstance(self._value, float)
+        return self._cast_to_value_type(value)
 
-        if not self._is_valid:
-            self._error = InvalidInputType(
-                f"Value of {self._label} should be of type {self._value_type}"
-            )
-        return self
+    @staticmethod
+    def validate_len(
+        value: str, min_len: int, max_len: int
+    ) -> Callable[[str], AppException | None]:
+        def _validate(label: str) -> AppException | None:
+            if not min_len <= len(value) <= max_len:
+                return LengthException(label, min_len, max_len)
+
+            return None
+
+        return _validate
+
+    @staticmethod
+    def validate_in_range(
+        value: int | float, min_value: int | None, max_value: int | None
+    ) -> Callable[[str], AppException | None]:
+        def _validate(label: str) -> AppException | None:
+            if not min_value and not max_value:
+                return ValueError("Please provide a min or max value")
+
+            if min_value and value < min_value:
+                return NoInRange(label, min_value, max_value)
+            if max_value and value > max_value:
+                return NoInRange(label, min_value, max_value)
+
+            return None
+
+        return _validate

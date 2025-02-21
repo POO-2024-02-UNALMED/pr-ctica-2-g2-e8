@@ -3,6 +3,7 @@ from app.ui import Input, FieldFrame
 from collections.abc import Callable
 from tkinter import messagebox, Tk, Menu
 from typing import Literal
+from datetime import datetime
 
 
 class MainWindow(Tk):
@@ -88,6 +89,7 @@ class MainWindow(Tk):
         return _list_processes
 
     def show_add_credit_card_form(self) -> None:
+        current_date = datetime.now()
         field_frame = FieldFrame(
             self,
             "Add Credit Card",
@@ -95,10 +97,32 @@ class MainWindow(Tk):
             "Add Credit Card",
             "Credit Card Information",
             (
-                Input("Card Number", "int"),
-                Input("Expiration Date", "str"),
-                Input("Security Code", "int"),
-                Input("Card Holder Name", "str"),
+                Input[int](
+                    "Card Number",
+                    int,
+                    _validations=(lambda x: Input.validate_len(str(x), 5, 16),),
+                ),
+                Input[str](
+                    "Expiration Date",
+                    str,
+                    _validations=(
+                        lambda x: Input.validate_len(str(x), 5, 5),
+                        lambda x: Input.validate_in_range(int(x[:2]), 1, 12),
+                        lambda x: Input.validate_in_range(
+                            int(x[3:]), int(str(current_date.year)[2:]), None
+                        ),
+                    ),
+                ),
+                Input[int](
+                    "Security Code",
+                    int,
+                    _validations=(lambda x: Input.validate_len(str(x), 3, 5),),
+                ),
+                Input[str](
+                    "Card Holder Name",
+                    str,
+                    _validations=(lambda x: Input.validate_len(x, 5, 50),),
+                ),
             ),
         )
         field_frame.grid(row=0, column=0)
