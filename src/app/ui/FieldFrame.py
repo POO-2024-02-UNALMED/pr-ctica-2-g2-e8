@@ -169,10 +169,6 @@ class FieldFrame(Frame):
                 messagebox.showerror("Error", str(e))
                 break
 
-        # clear the entry fields
-        for entry in self._entries:
-            entry.delete(0, "end")
-
         return self._submit_button
 
     def get_values(self) -> tuple[tuple[str, str | int | float | None], ...]:
