@@ -43,7 +43,7 @@ class Input[T]:
         self._entry_ref = entry
         return self
 
-    def get_value(self) -> TInputType:
+    def get_value(self) -> T:
         return self._value
 
     def get_label_value_pair(self) -> tuple[str, TInputType]:

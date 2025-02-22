@@ -1,3 +1,4 @@
 from .MainWindow import MainWindow
+from .App import App
 
-__all__ = ["MainWindow"]
+__all__ = ["MainWindow", "App"]

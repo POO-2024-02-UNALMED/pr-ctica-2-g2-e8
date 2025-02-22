@@ -2,6 +2,7 @@ from app.ui.Input import Input
 from app.ui.FieldFrame import FieldFrame
 from app.ui.DropdownPublisher import DropdownPublisher
 from app.ui.DropdownObserver import DropdownObserver
+from app.classes.customers import User
 
 from collections.abc import Callable
 from tkinter import messagebox, Tk, Menu, StringVar, ttk, X, Label
@@ -10,12 +11,14 @@ from datetime import datetime
 
 
 class MainWindow(Tk):
-    def __init__(self) -> None:
+    def __init__(self, user: User) -> None:
         super().__init__()
         self.geometry("450x450")
         self.title("Payment Manager")
-
+        self._user = user
+        self._container = ttk.Frame(self)
         self.create_menu()
+        self._container.pack(fill="both", expand=True)
 
     def create_menu(self) -> None:
         menu_bar = Menu(self)
@@ -35,9 +38,11 @@ class MainWindow(Tk):
             "Pay subscription",
             "Exit",
         )
+
+
         for functionality in functionalities:
             process_menu.add_command(
-                label=functionality, command=self.list_processes(functionality)
+                label=functionality, command=self._handle_selection(functionality)
             )
         menu_bar.add_cascade(label="Processes and Queries", menu=process_menu)
 
@@ -73,28 +78,36 @@ class MainWindow(Tk):
             "Pay subscription",
             "Exit",
         ],
-    ) -> Callable[[], None]:
-        def _list_processes() -> None:
-            match process:
-                case "Add subscription":
-                    self.show_add_subscription_form()
-                case "Add credit card":
-                    self.show_add_credit_card_form()
-                case "Change subscription paying method":
-                    self.show_change_payment_method_form()
-                case "Inactivate plan":
-                    self.show_inactivate_plan_form()
-                case "Pay subscription":
-                    self.show_pay_subscription_form()
-                case "Exit":
-                    self.quit()
+    ) -> None:
+        match process:
+            case "Add subscription":
+                self.show_add_subscription_form()
+            case "Add credit card":
+                self.show_add_credit_card_form()
+            case "Change subscription paying method":
+                self.show_change_payment_method_form()
+            case "Inactivate plan":
+                self.show_inactivate_plan_form()
+            case "Pay subscription":
+                self.show_pay_subscription_form()
+            case "Exit":
+                self.quit()
 
-        return _list_processes
+    def _clean_container(self) -> None:
+        for widget in self._container.winfo_children():
+            widget.destroy()
+
+    def _handle_selection(self, process: str) -> Callable[[], None]:
+        def _handle_selection() -> None:
+            self._clean_container()
+            return self.list_processes(process)
+
+        return _handle_selection
 
     def show_add_credit_card_form(self) -> None:
         current_date = datetime.now()
         field_frame = FieldFrame(
-            self,
+            self._container,
             "Add Credit Card",
             "Please enter the following information to add a new credit card",
             "Add Credit Card",
@@ -142,13 +155,13 @@ class MainWindow(Tk):
         }
 
         subscriptions_dropdown = DropdownPublisher(
-            self,
+            self._container,
             "Select Subscription",
             subscriptions,
         )
 
         payment_method_dropdown = DropdownPublisher(
-            self,
+            self._container,
             "Select the payment method",
             [],
         )
