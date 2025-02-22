@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from Gateways import IGateway
+from app.classes.gateways.Gateway import IGateway
 
 from app.classes.WithId import WithId
-from app.classes.Transactions import TransactionStatus, Transaction
+from app.classes.transactions.Transaction import TransactionStatus, Transaction
 from app.classes.plans import SubscriptionStatus
 from app.database import Repository
 

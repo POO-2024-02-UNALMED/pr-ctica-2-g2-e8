@@ -1,0 +1,17 @@
+from enum import Enum
+
+class Franchise(Enum):
+    VISA = "VISA"
+    MASTERCARD = "MASTERCARD"
+    AMERICAN_EXPRESS = "AMERICAN EXPRESS"
+    DINERS_CLUB = "DINERS CLUB"
+    DISCOVER = "DISCOVER"
+    JCB = "JCB"
+    UNIONPAY = "UNIONPAY"
+    MAESTRO = "MAESTRO"
+    VISA_ELECTRON = "VISA_ELECTRON"
+    V_PAY = "V_PAY"
+    MIR = "MIR"
+    TROY = "TROY"
+    UATP = "UATP"
+    UNKNOWN = "UNKNOWN"

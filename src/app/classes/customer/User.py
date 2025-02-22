@@ -1,62 +1,14 @@
-from app.classes.WithId import WithId
-from app.classes.plans.Plan import Plan, Subscription, SubscriptionStatus
-from Transactions import Transaction, TransactionStatus
-from Gateways import Credential
-from database import Repository
-from enum import Enum
-from datetime import datetime
+from .Customer import Customer
+from ..plans.Plan import Plan
+from ..plans.Subscription import Subscription
+from ..transactions.Transaction import Transaction
+from ..transactions.TransactionStatus import TransactionStatus
+from ..plans.SubscriptionStatus import SubscriptionStatus
+from classes.WithId import WithId
+from ...database.Repository import Repository
+
 import os
-
-
-class DocumentType(Enum):
-    CC = "CC"
-    CE = "CE"
-    TI = "TI"
-    PP = "PP"
-    NIT = "NIT"
-
-
-class Customer(WithId):
-    def __init__(
-        self,
-        email: str,
-        password: str,
-        document_type: DocumentType,
-        document_number: int,
-    ) -> None:
-        super().__init__(WithId.create_id(email, password))
-        self.email = email
-        self.password = password
-        self.document_type = document_type
-        self.document_number = document_number
-
-    def get_email(self) -> str:
-        return self.email
-
-    def get_document_type(self) -> DocumentType:
-        return self.document_type
-
-    def get_document_number(self) -> int:
-        return self.document_number
-
-
-class Admin(Customer):
-    def __init__(self, email, password, document_type, document_number) -> None:
-        super.__init__(email, password, document_type, document_number)
-
-    def create_plan(self, name, description, price):
-        plan = Plan(name, description, price)
-        Repository.save(plan)
-        return plan
-
-    def configure_gateway(self, gateway, public_key, private_key):
-        credential = Credential(public_key, private_key, gateway)
-        Repository.save(credential)
-        return credential
-
-    def inactivate(self, plan):
-        Repository.update(plan)
-
+from datetime import datetime
 
 class User(Customer):
     def __init__(self, email, password, document_type, document_number):
