@@ -1,5 +1,5 @@
 from enum import Enum
 
-class PlanStatus(Enum):
-    ACTIVE = "ACTIVE"
-    INACTIVE = "INACTIVE"
+class PlanStatus(str, Enum):
+    ACTIVE: str = "ACTIVE"
+    INACTIVE: str = "INACTIVE"

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from app.classes.gateways.Gateway import IGateway
+from app.classes.gateways import IGateway
 
 from app.classes.WithId import WithId
-from app.classes.transactions.Transaction import TransactionStatus, Transaction
-from app.classes.plans import SubscriptionStatus
+from app.classes.transactions import TransactionStatus, Transaction
+from .SubscriptionStatus import SubscriptionStatus
 from app.database import Repository
 
 from datetime import datetime, timedelta
@@ -12,7 +12,7 @@ import os
 
 
 class Subscription(WithId):
-    def __init__(self, user, plan):
+    def __init__(self, user, plan, card=None):
         super().__init__(self.create_id(user.get_email(), plan.get_name()))
         self.user = user
         self.plan = plan
@@ -20,7 +20,7 @@ class Subscription(WithId):
         self.next_charge_date: datetime = datetime.now()
         self.status: Subscription = SubscriptionStatus.INACTIVE
         self.number_of_collection_attempts: int = 0
-        self.card = None
+        self.card = card
         self.suspension_date: datetime = datetime.max
 
     def process_payment(self, transaction: Transaction | None = None) -> Transaction:

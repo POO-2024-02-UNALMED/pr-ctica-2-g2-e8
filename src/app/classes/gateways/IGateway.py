@@ -1,17 +1,41 @@
-from abc import ABC
+from abc import ABC, abstractmethod
+from app.classes.transactions import Transaction, Card
+from app.classes.gateways import Gateway
+
+import re
+
 
 class IGateway(ABC):
-    def pay(self, transaction):
-        pass
+    @staticmethod
+    @abstractmethod
+    def pay(transaction: Transaction): ...
 
-    def add_credit_card(self, card_number, card_holder, expiration_date, cvv, user):
-        pass
+    @abstractmethod
+    def add_credit_card(
+        self,
+        card_number: int,
+        card_holder: str,
+        expiration_date: str,
+        cvv: int,
+        user: str,
+    ) -> Card | None: ...
 
-    def authenticated(self):
-        pass
+    @abstractmethod
+    def authenticated(self): ...
 
-    def delete_card(self, card):
-        pass
+    @abstractmethod
+    def delete_card(self, card: Card): ...
 
-    def validate(self, card_number, card_holder, expiration_date, cvv):
-        return len(card_number) > 4 and len(card_holder) > 3 and expiration_date.matches("\d{2}/\d{2}") and len(cvv) > 2 and len(cvv) < 5
+    def validate(
+        self, card_number: int, card_holder: str, expiration_date: str, cvv: int
+    ):
+        return (
+            len(card_number) > 4
+            and len(card_holder) > 3
+            and re.match("\d{2}/\d{2}", expiration_date)
+            and len(cvv) > 2
+            and len(cvv) < 5
+        )
+
+    @abstractmethod
+    def get_name(self) -> Gateway: ...

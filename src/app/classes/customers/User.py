@@ -1,29 +1,27 @@
 from .Customer import Customer
 from ..plans.Plan import Plan
-from ..plans.Subscription import Subscription
-from ..transactions.Transaction import Transaction
-from ..transactions.TransactionStatus import TransactionStatus
-from ..plans.SubscriptionStatus import SubscriptionStatus
-from classes.WithId import WithId
+from app.classes.plans.Subscription import Subscription, SubscriptionStatus
+from app.classes.transactions import Card, Transaction
+from app.classes.WithId import WithId
 from ...database.Repository import Repository
+from app.classes.customers import DocumentType
+
+from typing import cast
 
 import os
 from datetime import datetime
 
-class User(Customer):
-    def __init__(self, email, password, document_type, document_number):
-        super().__init__(email, password, document_type, document_number)
 
-    def change_subscription_payment_method(self, subscription, card):
-        subscription.set_payment_method(card)
-        transaction = Transaction(
-            subscription.get_plan().get_name(),
-            subscription.get_user(),
-            1,
-            TransactionStatus.PENDING,
-        )
-        subscription.process_payment(transaction)
-        return transaction.get_status() == TransactionStatus.ACCEPTED
+class User(Customer):
+    def __init__(
+        self,
+        email: str,
+        password: str,
+        document_type: DocumentType,
+        document_number: int,
+    ):
+        super().__init__(email, password, document_type, document_number)
+        self.subscriptions = []
 
     def save_on_repository_and_add_to_subscriptions(self, subscription):
         Repository.save(
@@ -36,15 +34,7 @@ class User(Customer):
             self.subscriptions = []
             self.subscriptions.append(subscription)
 
-    def add_subscription(self, plan):
-        subscription = Subscription(self, plan)
-        initial_charge_transaction = None
-        if self.has_credit_card():
-            initial_charge_transaction = subscription.process_payment()
-        self.save_on_repository_and_add_to_subscriptions(subscription)
-        return initial_charge_transaction
-
-    def add_subscription(self, plan, card):
+    def add_subscription(self, plan: Plan, card: Card | None = None) -> Transaction:
         subscription = Subscription(self, plan, card)
         initial_charge_transaction = subscription.process_payment()
         self.save_on_repository_and_add_to_subscriptions(subscription)
@@ -65,7 +55,8 @@ class User(Customer):
             subscription = Repository.load(
                 "Subscription" + os.path.sep + plan.get_name(), _id
             )
-            if subscription:
+            if isinstance(Subscription, subscription):
+                subscription = cast(Subscription, subscription)
                 subscription.set_user(self)
                 subscription.set_plan(plan)
                 if subscription.get_next_charge_date().is_before(datetime.now()):
@@ -115,4 +106,4 @@ class User(Customer):
         return user_cards
 
     def get_gateway(self):
-        return self.gateway
+        return "ProjectGateway"

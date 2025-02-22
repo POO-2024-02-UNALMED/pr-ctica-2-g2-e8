@@ -5,10 +5,8 @@ from app.classes.customers.Customer import Customer
 from app.classes.customers.DocumentType import DocumentType
 from app.classes.customers.User import User
 from app.classes.gateways.Gateway import Gateway
-from app.classes.gateways.GatewaysFactory import GatewaysFactory
-from app.classes.gateways.IGateway import IGateway
+from app.classes.gateways import GatewaysFactory, ProjectGateway
 from app.classes.plans import Subscription, Plan
-from app.classes.transactions.Card import Card
 from app.database import Repository
 
 
@@ -20,6 +18,7 @@ class Loader:
         self.system_admin = None
         self.debug_mode = debug_mode
         self.plans = []
+        self._gateway_factory = GatewaysFactory([ProjectGateway()])
 
     def create_random_users(self) -> None:
         for i in range(10):
@@ -28,13 +27,12 @@ class Loader:
                 f"password{i}",
                 DocumentType.CC,
                 f"1234567890{i}",
-                Gateway.PROJECT_GATEWAY,
             )
-            card = GatewaysFactory.get_gateway(Gateway.PROJECT_GATEWAY).add_credit_card(
+            card = self._gateway_factory.get_gateway(Gateway.PROJECT_GATEWAY).add_credit_card(
                 "5434567890111213", user.get_email(), "02/35", "123", user
             )
             user.add_credit_card(card)
-            user.add_subscription(self.plans[i % 4])
+            user.add_subscription(self.plans[i % 4], card)
             Repository.save(user)
 
     def load_data(self) -> None:
@@ -56,13 +54,11 @@ class Loader:
             self.password,
             DocumentType.CC,
             admin.get_document_number(),
-            Gateway.PROJECT_GATEWAY,
         )
 
         Repository.save(admin)
         admin.configure_gateway(Gateway.PROJECT_GATEWAY, "publicKey", "privateKey")
-        GatewaysFactory.initialize_gateway(Gateway.PROJECT_GATEWAY)
-        project_gateway = GatewaysFactory.get_gateway(Gateway.PROJECT_GATEWAY)
+        project_gateway = self._gateway_factory.get_gateway(Gateway.PROJECT_GATEWAY)
 
         card = project_gateway.add_credit_card(
             "5434567890111213", user.get_email(), "02/35", "123", user

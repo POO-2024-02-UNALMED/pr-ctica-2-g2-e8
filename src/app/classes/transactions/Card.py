@@ -1,4 +1,4 @@
-from classes.WithId import WithId
+from app.classes.WithId import WithId
 from .Franchise import Franchise
 
 class Card(WithId):

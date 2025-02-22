@@ -1,23 +1,17 @@
-from classes.WithId import WithId
+from app.classes.WithId import WithId
 
 from datetime import datetime
 
 class Transaction(WithId):
-    def __init__(self, description, user, price):
+    def __init__(self, description, user, price, payment_method, status):
         super().__init__(self.create_id(self.get_month_and_year(), user.get_email()))
         self.description = description
         self.price = price
         self.user_email = user.get_email()
         self.gateway = user.get_gateway()
         self.date = datetime.now()
-
-    def __init__(self, description, user, price, status):
-        self(description, user, price)
+        self.payment_method = payment_method
         self.status = status
-
-    def __init__(self, description, user, price, status, card):
-        self(description, user, price, status)
-        self.payment_method = card
 
     def get_payment_method(self):
         return self.payment_method

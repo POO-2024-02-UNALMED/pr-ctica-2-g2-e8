@@ -5,7 +5,7 @@ from ...database.Repository import Repository
 
 class Admin(Customer):
     def __init__(self, email, password, document_type, document_number) -> None:
-        super.__init__(email, password, document_type, document_number)
+        super().__init__(email, password, document_type, document_number)
 
     def create_plan(self, name, description, price):
         plan = Plan(name, description, price)

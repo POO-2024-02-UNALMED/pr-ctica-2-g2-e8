@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 from app.classes import WithId
-from app.classes.plans import PlanStatus, SubscriptionStatus, Subscription
+from app.classes.plans import SubscriptionStatus, Subscription
+from .PlanStatus import PlanStatus
 from app.database import Repository
 
 from datetime import datetime

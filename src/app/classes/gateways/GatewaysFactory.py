@@ -1,30 +1,17 @@
-from .ProjectGateway import ProjectGateway
+from app.classes.gateways import IGateway, Gateway
 
 class GatewaysFactory:
-    def __init__(self, gateway):
-        self.gateways = {}
-        self.gateway = gateway
-        self.initialize_gateway()
+    def __init__(self, gateways_to_add: list[IGateway]) -> None:
+        self.gateways: dict[Gateway, IGateway] = {}
+        self.iterate_and_add(gateways_to_add)
 
-    def __init__(self, gatewaysToAdd):
-        self.gateways = {}
-        self.iterate_and_add(gatewaysToAdd)
+    def iterate_and_add(self, gateways_to_add: list[IGateway]) -> None:
+        for gateway in gateways_to_add:
+            self.initialize_gateway(gateway)
 
-    def iterate_and_add(self, gatewaysToAdd):
-        for gateway in gatewaysToAdd:
-            self.gateways[gateway] = ProjectGateway()
-
-    def get_gateway(self, gateway):
+    def get_gateway(self, gateway: Gateway) -> IGateway:
         return self.gateways.get(gateway)
 
-    def initialize_gateway(self, gateway):
-        if not self.gateways:
-            self.gateways[gateway] = ProjectGateway()
-        else:
-            self.gateways[gateway] = ProjectGateway()
-
-    def initialize_gateways(self, gatewaysAndCredentials):
-        if not self.gateways:
-            self.iterate_and_add(gatewaysAndCredentials)
-        else:
-            self.iterate_and_add(gatewaysAndCredentials)
+    def initialize_gateway(self, gateway: IGateway) -> None:
+        if not self.gateways.get(gateway.get_name()):
+            self.gateways[gateway.get_name()] = gateway
