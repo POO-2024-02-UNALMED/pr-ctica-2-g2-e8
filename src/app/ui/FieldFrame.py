@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from app.classes.exceptions import AppException
-from app.ui import Input
+from app.ui.Input import Input
 
 from collections.abc import Callable
 from tkinter import Frame, Label, Entry, Button, Event, messagebox

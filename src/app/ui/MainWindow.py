@@ -1,7 +1,10 @@
-from app.ui import Input, FieldFrame
+from app.ui.Input import Input
+from app.ui.FieldFrame import FieldFrame
+from app.ui.DropdownPublisher import DropdownPublisher
+from app.ui.DropdownObserver import DropdownObserver
 
 from collections.abc import Callable
-from tkinter import messagebox, Tk, Menu
+from tkinter import messagebox, Tk, Menu, StringVar, ttk, X, Label
 from typing import Literal
 from datetime import datetime
 
@@ -93,7 +96,7 @@ class MainWindow(Tk):
         field_frame = FieldFrame(
             self,
             "Add Credit Card",
-            ("Please enter the followinginformation to add a new credit card"),
+            "Please enter the following information to add a new credit card",
             "Add Credit Card",
             "Credit Card Information",
             (
@@ -130,7 +133,53 @@ class MainWindow(Tk):
     def show_add_subscription_form(self) -> None: ...
     def show_change_payment_method_form(self) -> None: ...
     def show_inactivate_plan_form(self) -> None: ...
-    def show_pay_subscription_form(self) -> None: ...
+    def show_pay_subscription_form(self) -> None:
+        subscriptions = ["Subscription 1", "Subscription 2", "Subscription 3"]
+        subscriptions_payment_methods = {
+            "Subscription 1": ["Credit Card1", "Debit Card1", "Cash1"],
+            "Subscription 2": ["Credit Card2", "Debit Card2", "Cash2"],
+            "Subscription 3": ["Credit Card3", "Debit Card3", "Cash3"],
+        }
+
+        subscriptions_dropdown = DropdownPublisher(
+            self,
+            "Select Subscription",
+            subscriptions,
+        )
+
+        payment_method_dropdown = DropdownPublisher(
+            self,
+            "Select the payment method",
+            [],
+        )
+
+        subscriptions_dropdown.attach(
+            DropdownObserver(
+                payment_method_dropdown,
+                lambda subscription: subscriptions_payment_methods.get(
+                    subscription, []
+                ),
+            )
+        )
+
+    def _pay_subscription(self, subscription: str, payment_method: str) -> None:
+        messagebox.showinfo(
+            "Payment",
+            f"Subscription {subscription} has been paid using {payment_method}",
+        )
+
+    def _show_dropdown(
+        self, label: str, values: list[str], callback: Callable[[str], None]
+    ) -> tuple[ttk.Combobox, StringVar]:
+        selected_value = StringVar()
+        Label(self, text=label).pack(fill=X, padx=5, pady=5)
+        dropdown = ttk.Combobox(
+            self, textvariable=selected_value, values=values, state="readonly"
+        )
+        dropdown.pack(fill=X, padx=5, pady=5)
+        dropdown.bind("<<ComboboxSelected>>", lambda _: callback(selected_value.get()))
+        # callback(selected_value.get())
+        return dropdown, selected_value
 
     def show_about_info(self) -> None:
         messagebox.showinfo(
