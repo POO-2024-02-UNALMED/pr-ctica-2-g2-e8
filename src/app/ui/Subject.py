@@ -9,7 +9,7 @@ class Subject:
         if observer not in self._observers:
             self._observers.append(observer)
 
-    def detach(self, observer):
+    def detach(self, observer: observer.Observer):
         try:
             self._observers.remove(observer)
         except ValueError:

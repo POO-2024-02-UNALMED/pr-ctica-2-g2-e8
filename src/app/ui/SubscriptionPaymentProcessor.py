@@ -1,8 +1,8 @@
 from collections.abc import Generator
-from tkinter import ttk, Label, Frame
+from tkinter import ttk, Label, Frame, messagebox
 from app.ui.DropdownPublisher import DropdownPublisher
 from app.ui.DropdownObserver import DropdownObserver
-from app.classes.transactions import Transaction, Card, TransactionStatus
+from app.classes.transactions import Transaction, TransactionStatus
 from app.classes.customers import User
 from app.classes.plans import Subscription
 
@@ -19,10 +19,6 @@ class SubscriptionPaymentProcessor(Frame):
         self._number_of_payments_dropdown: DropdownPublisher | None = None
 
         self._show_pay_subscription_form()
-
-    @staticmethod
-    def _generate_card_data(card: Card) -> str:
-        return f"{card.get_last_four()}-{card.get_franchise()}-{card.get_due_date()}"
 
     def _get_payments_values(
         self,
@@ -48,26 +44,26 @@ class SubscriptionPaymentProcessor(Frame):
             if _subscription.get_plan().get_name() == subscription_plan_name
         )
         return (
-            SubscriptionPaymentProcessor._generate_card_data(card)
+            card.get_description()
             for card in self._selected_subscription.get_payment_methods()
         )
 
     def _show_pay_subscription_form(self) -> None:
         self._subscriptions_dropdown = DropdownPublisher(
             self._container,
-            "Select Subscription",
+            "Select Subscription REQUIRED",
             (_subs.get_plan().get_name() for _subs in self._subscriptions),
         )
 
         self._payment_method_dropdown = DropdownPublisher(
             self._container,
-            "Select the payment method",
+            "Select the payment method REQUIRED",
             (_ for _ in ()),
         )
 
         self._number_of_payments_dropdown = DropdownPublisher(
             self._container,
-            "Number of payments",
+            "Number of payments REQUIRED",
             (_ for _ in ()),
         )
 
@@ -89,6 +85,13 @@ class SubscriptionPaymentProcessor(Frame):
         ttk.Button(self._container, text="Pay", command=self._handle_submit).pack()
 
     def _handle_submit(self) -> None:
+        try:
+            self._process_payment()
+        except StopIteration:
+            messagebox.showerror("Error", "Please fill all the required fields")
+
+
+    def _process_payment(self) -> None:
         subscription = next(
             _subs
             for _subs in self._subscriptions
@@ -97,7 +100,7 @@ class SubscriptionPaymentProcessor(Frame):
         payment_method = next(
             card
             for card in subscription.get_payment_methods()
-            if SubscriptionPaymentProcessor._generate_card_data(card)
+            if card.get_description()
             == self._payment_method_dropdown.state
         )
         number_of_payments = int(
@@ -130,6 +133,9 @@ class SubscriptionPaymentProcessor(Frame):
                     self._container,
                     text=(
                         f"Next charge date: {_transaction.get_charge_date()} total: {_transaction.get_total()}"
-                        "- plan: {subscription.get_plan().get_name()}"
+                        f"- plan: {subscription.get_plan().get_name()}"
                     ),
                 ).pack()
+
+        self._number_of_payments_dropdown.clear()
+        self._payment_method_dropdown.clear()

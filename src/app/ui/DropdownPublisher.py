@@ -30,3 +30,7 @@ class DropdownPublisher(Subject, ttk.Combobox):
 
     def set_state(self, new_state: str) -> None:
         self.state = new_state
+
+    def clear(self) -> None:
+        self.set_state("")
+        self.set("")

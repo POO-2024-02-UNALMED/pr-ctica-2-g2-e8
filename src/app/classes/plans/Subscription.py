@@ -75,7 +75,7 @@ class Subscription(WithId):
                 TransactionStatus.PENDING,
                 date.today() + timedelta(days=30 * (i + 1)),
             )
-            for i in range(1, number_of_installments - 1)
+            for i in range(number_of_installments-1)
             if number_of_installments > 1
         )
 
@@ -88,12 +88,12 @@ class Subscription(WithId):
             )
 
         else:
-            self._pending_transactions = (*self._pending_transactions, transaction)
+            self._pending_transactions = (*self._pending_transactions, *pending_transactions)
 
-    def upsert_payment_method(self, card):
-        self.set_payment_method(card)
+    def upsert_payment_method(self, card: Card) -> bool:
+        self._card = card
         Repository.update(self)
-        transaction = Transaction(self._plan, self._user, 1, TransactionStatus.PENDING)
+        transaction = Transaction(self._plan, self._user, 1, self._card, TransactionStatus.PENDING)
         self.process_payment(transaction)
         return transaction.get_status() == TransactionStatus.ACCEPTED
 
@@ -102,7 +102,7 @@ class Subscription(WithId):
 
     def get_payment_methods(self) -> tuple[Card, ...]:
         if not self._card:
-            return tuple(self._user.get_credit_cards())
+            return tuple(self._user.get_payment_methods())
         return (self._card,)
 
     def get_user(self):

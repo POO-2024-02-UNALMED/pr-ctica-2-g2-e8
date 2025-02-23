@@ -29,6 +29,9 @@ class Card(WithId):
     def get_card_owner(self):
         return self.card_owner
 
+    def get_description(self):
+        return f"{self.last_four} - {self.franchise} - {self.due_date}"
+
     @staticmethod
     def determine_franchise(number) -> Franchise:
         if number.startswith("4"):

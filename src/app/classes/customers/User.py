@@ -37,9 +37,9 @@ class User(Customer):
         self.save_on_repository_and_add_to_subscriptions(subscription)
         return initial_charge_transaction
 
-    def get_user_subscribed_plans(self):
+    def get_user_subscribed_plans(self) -> list[str]:
         user_subscriptions = self.get_subscriptions()
-        plans = []
+        plans: list[str] = []
         for subscription in user_subscriptions:
             plans.append(subscription.get_plan())
         return plans
@@ -97,14 +97,11 @@ class User(Customer):
     def remove_credit_card(self, card):
         Repository.delete(card, "Card" + os.path.sep + self.get_id())
 
-    def get_credit_cards(self):
+    def get_payment_methods(self) -> tuple[Card]:
         cards = Repository.load_all_object_in_directory(
             "Card" + os.path.sep + self.get_id()
         )
-        user_cards = []
-        for card in cards:
-            user_cards.append(card)
-        return user_cards
+        return tuple(cast(Card, card) for card in cards)
 
     def get_gateway(self) -> Gateway:
         return self._gateway

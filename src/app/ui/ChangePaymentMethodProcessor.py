@@ -1,0 +1,73 @@
+from tkinter import Frame, messagebox
+from app.classes.customers import User
+from app.ui.DropdownPublisher import DropdownPublisher
+from .EventListener import EventListener
+from .AddCreditCardProcessor import AddCreditCardProcessor
+
+
+class ChangePaymentMethodProcessor(Frame):
+    def __init__(self, user: User, container: Frame) -> None:
+        super().__init__(container)
+        self._user = user
+        self._container = container
+        self._subscriptions_dropdown: DropdownPublisher | None = None
+        self._payment_method_dropdown: DropdownPublisher | None = None
+
+        self._show_change_payment_method_form()
+
+    def _handle_selection(self, payment_method: str) -> None:
+        if payment_method == "Add new credit card":
+            frame = Frame(self._container)
+            frame.pack()
+            field_frame = AddCreditCardProcessor.show_add_credit_card_form(frame)
+            field_frame.pack()
+            field_frame.get_submit_button().config(
+                command=lambda: self._add_credit_card_to_subscription(
+                    field_frame.get_inputs()
+                )
+            )
+        else:
+            try:
+                selected_subscription = next(
+                    _subscription
+                    for _subscription in self._user.get_subscriptions()
+                    if _subscription.get_plan().get_name()
+                    == self._subscriptions_dropdown.state
+                )
+                selected_payment_method = next(
+                    _payment_method
+                    for _payment_method in self._user.get_payment_methods()
+                    if _payment_method.get_description() == payment_method
+                )
+                if selected_subscription.upsert_payment_method(
+                    selected_payment_method
+                ):
+                    messagebox.showinfo(
+                        "Payment Method",
+                        f"Payment method has been updated to {payment_method}",
+                    )
+                self._subscriptions_dropdown.clear()
+            except StopIteration:
+                messagebox.showerror(
+                    "Missing Selection",
+                    "Please select a subscription",
+                )
+
+
+    def _show_change_payment_method_form(self) -> None:
+        self._subscriptions_dropdown = DropdownPublisher(
+            self._container,
+            "Select Subscription you want to update REQUIRED",
+            (_subs.get_plan().get_name() for _subs in self._user.get_subscriptions()),
+        )
+        self._payment_method_dropdown = DropdownPublisher(
+            self._container,
+            "Select the payment method you want to use REQUIRED",
+            ("Add new credit card",)
+            + tuple(
+                payment_method.get_description()
+                for payment_method in self._user.get_payment_methods()
+            ),
+        )
+
+        self._payment_method_dropdown.attach(EventListener(self._handle_selection))

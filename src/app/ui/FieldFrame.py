@@ -4,7 +4,7 @@ from app.classes.exceptions import AppException
 from app.ui.Input import Input
 
 from collections.abc import Callable
-from tkinter import Frame, Label, Entry, Button, Event, messagebox
+from tkinter import Frame, Label, Entry, Button, Event, messagebox, TclError
 from typing import Final
 
 
@@ -32,12 +32,15 @@ class FieldFrame(Frame):
         self._submit_button: Button | None = None
         self._reset_button: Button | None = None
 
-        master.grid_rowconfigure(0, weight=1)
-        master.grid_columnconfigure(0, weight=1)
+        try:
+            master.grid_rowconfigure(0, weight=1)
+            master.grid_columnconfigure(0, weight=1)
+            self.grid(row=0, column=0, sticky="nsew")
+            self.grid_rowconfigure(0, weight=1)
+            self.grid_columnconfigure(0, weight=1)
+        except TclError:
+            pass
 
-        self.grid(row=0, column=0, sticky="nsew")
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_columnconfigure(0, weight=1)
 
         Label(self, text=title, bg=FieldFrame._BG_COLOR, font=FieldFrame._FONT).grid(
             row=0,
@@ -91,7 +94,6 @@ class FieldFrame(Frame):
             pady=FieldFrame._GAP,
             padx=FieldFrame._GAP,
         )
-        self.grid(row=0, column=0, sticky="nsew")
 
         for i, input in enumerate(self._inputs):
             Label(
