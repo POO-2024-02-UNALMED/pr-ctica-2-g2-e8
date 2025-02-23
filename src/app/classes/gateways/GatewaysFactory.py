@@ -1,17 +1,24 @@
 from app.classes.gateways import IGateway, Gateway
 
+
 class GatewaysFactory:
-    def __init__(self, gateways_to_add: list[IGateway]) -> None:
-        self.gateways: dict[Gateway, IGateway] = {}
-        self.iterate_and_add(gateways_to_add)
+    gateways: dict[Gateway, IGateway] = {}
 
-    def iterate_and_add(self, gateways_to_add: list[IGateway]) -> None:
+    def __init__(self) -> None:
+        raise NotImplementedError("This class should not be instantiated")
+
+    @classmethod
+    def initialize_gateways(cls, gateways_to_add: list[IGateway]) -> None:
         for gateway in gateways_to_add:
-            self.initialize_gateway(gateway)
+            cls.initialize_gateway(gateway)
 
-    def get_gateway(self, gateway: Gateway) -> IGateway:
-        return self.gateways.get(gateway)
+    @classmethod
+    def get_gateway(cls, gateway: Gateway) -> IGateway:
+        return cls.gateways.get(gateway)
 
-    def initialize_gateway(self, gateway: IGateway) -> None:
-        if not self.gateways.get(gateway.get_name()):
-            self.gateways[gateway.get_name()] = gateway
+    @classmethod
+    def initialize_gateway(cls, gateway: IGateway) -> IGateway:
+        if not cls.gateways.get(gateway.get_name()):
+            cls.gateways[gateway.get_name()] = gateway
+
+        return cls.gateways[gateway.get_name()]

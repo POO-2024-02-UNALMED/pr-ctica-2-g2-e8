@@ -28,9 +28,9 @@ class Card(WithId):
 
     def get_card_owner(self):
         return self.card_owner
-    
+
     @staticmethod
-    def get_franchise(number):
+    def determine_franchise(number) -> Franchise:
         if number.startswith("4"):
             return Franchise.VISA
         elif number.startswith("5"):

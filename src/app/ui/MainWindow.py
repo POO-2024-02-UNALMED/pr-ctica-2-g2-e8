@@ -1,13 +1,13 @@
 from app.ui.Input import Input
 from app.ui.FieldFrame import FieldFrame
-from app.ui.DropdownPublisher import DropdownPublisher
-from app.ui.DropdownObserver import DropdownObserver
 from app.classes.customers import User
 
 from collections.abc import Callable
 from tkinter import messagebox, Tk, Menu, StringVar, ttk, X, Label
 from typing import Literal
 from datetime import datetime
+
+from .SubscriptionPaymentProcessor import SubscriptionPaymentProcessor
 
 
 class MainWindow(Tk):
@@ -38,7 +38,6 @@ class MainWindow(Tk):
             "Pay subscription",
             "Exit",
         )
-
 
         for functionality in functionalities:
             process_menu.add_command(
@@ -147,39 +146,14 @@ class MainWindow(Tk):
     def show_change_payment_method_form(self) -> None: ...
     def show_inactivate_plan_form(self) -> None: ...
     def show_pay_subscription_form(self) -> None:
-        subscriptions = ["Subscription 1", "Subscription 2", "Subscription 3"]
-        subscriptions_payment_methods = {
-            "Subscription 1": ["Credit Card1", "Debit Card1", "Cash1"],
-            "Subscription 2": ["Credit Card2", "Debit Card2", "Cash2"],
-            "Subscription 3": ["Credit Card3", "Debit Card3", "Cash3"],
-        }
-
-        subscriptions_dropdown = DropdownPublisher(
-            self._container,
-            "Select Subscription",
-            subscriptions,
-        )
-
-        payment_method_dropdown = DropdownPublisher(
-            self._container,
-            "Select the payment method",
-            [],
-        )
-
-        subscriptions_dropdown.attach(
-            DropdownObserver(
-                payment_method_dropdown,
-                lambda subscription: subscriptions_payment_methods.get(
-                    subscription, []
-                ),
-            )
-        )
+        SubscriptionPaymentProcessor(self._user, self._container)
 
     def _pay_subscription(self, subscription: str, payment_method: str) -> None:
         messagebox.showinfo(
             "Payment",
             f"Subscription {subscription} has been paid using {payment_method}",
         )
+
 
     def _show_dropdown(
         self, label: str, values: list[str], callback: Callable[[str], None]

@@ -1,5 +1,6 @@
 from app.ui.Subject import Subject
 from tkinter import StringVar, ttk, Label, X, Misc
+from collections.abc import Generator
 
 
 class DropdownPublisher(Subject, ttk.Combobox):
@@ -7,9 +8,9 @@ class DropdownPublisher(Subject, ttk.Combobox):
         self,
         root: Misc,
         label: str,
-        initial_values: list[str],
+        initial_values: Generator[str, None, None],
     ) -> None:
-        ttk.Combobox.__init__(self, root, values=initial_values, state="readonly")
+        ttk.Combobox.__init__(self, root, values=tuple(initial_values), state="readonly")
         Subject.__init__(self)
         self._state: StringVar = StringVar()
         Label(root, text=label).pack(fill=X, padx=5, pady=5)

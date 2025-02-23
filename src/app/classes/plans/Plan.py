@@ -48,7 +48,7 @@ class Plan(WithId):
     @staticmethod
     def get_subscriptions(plan) -> list[Subscription]:
         with_id_list = Repository.load_all_object_in_directory(
-            "Subscription" + os.path.sep + plan.get_name()
+            Subscription.DB_PATH + os.path.sep + plan.get_name()
         )
         return [
             subscription
@@ -59,7 +59,7 @@ class Plan(WithId):
     @staticmethod
     def inactivate_subscriptions(plan) -> list[Subscription]:
         with_id_list = Repository.load_all_object_in_directory(
-            "Subscription" + os.path.sep + plan.get_name()
+            Subscription.DB_PATH + os.path.sep + plan.get_name()
         )
         subscriptions: list[Subscription] = []
         for _object in with_id_list:
@@ -68,7 +68,7 @@ class Plan(WithId):
                 _object.set_suspension_date(_object.get_next_charge_date())
                 _object.set_next_charge_date(datetime.MIN)
                 Repository.update(
-                    _object, "Subscription" + os.path.sep + plan.get_name()
+                    _object, Subscription.DB_PATH + os.path.sep + plan.get_name()
                 )
                 subscriptions.append(_object)
         return subscriptions
