@@ -10,16 +10,16 @@ class Customer(WithId):
         document_number: int,
     ) -> None:
         super().__init__(WithId.create_id(email, password))
-        self.email = email
-        self.password = password
-        self.document_type = document_type
-        self.document_number = document_number
+        self._email = email
+        self._password = password
+        self._document_type = document_type
+        self._document_number = document_number
 
     def get_email(self) -> str:
-        return self.email
+        return self._email
 
     def get_document_type(self) -> DocumentType:
-        return self.document_type
+        return self._document_type
 
     def get_document_number(self) -> int:
-        return self.document_number
+        return self._document_number

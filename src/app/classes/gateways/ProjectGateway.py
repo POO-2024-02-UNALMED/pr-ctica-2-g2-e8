@@ -28,7 +28,7 @@ class ProjectGateway(Authenticate, IGateway):
         card = Card(
             str(card_number)[-4:],
             expiration_date,
-            Card.get_franchise(str(card_number)),
+            Card.determine_franchise(str(card_number)),
             self.generate_card_token(card_number, card_holder, expiration_date),
             Gateway.PROJECT_GATEWAY,
             user,

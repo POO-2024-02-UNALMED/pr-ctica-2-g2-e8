@@ -4,6 +4,7 @@ from app.database import Repository
 from tkinter import Tk, messagebox
 from .FieldFrame import FieldFrame
 from .MainWindow import MainWindow
+from .WelcomeWindow import WelcomeWindow
 from .Input import Input
 from typing import cast
 
@@ -11,19 +12,20 @@ from typing import cast
 class App:
     print("App")
     def __init__(self) -> None:
-        self.show_login_window()
+        self._show_welcome_window()
 
-    def show_window_1(self, user_name: str, password: str) -> None:
+    def _show_main_window(self, user_name: str, password: str) -> None:
         user = Repository.load("User", WithId.create_id(user_name, password))
         if not user:
             messagebox.showerror("Error", "User not found")
-            return self.show_login_window()
+            return self._show_login_window()
 
         MainWindow(cast(User, user)).run()
 
-    def show_window_2(self) -> None: ...
+    def _show_welcome_window(self) -> None:
+        WelcomeWindow(self._show_login_window).run()
 
-    def show_login_window(self) -> None:
+    def _show_login_window(self) -> None:
         window = Tk()
         window.geometry("400x400")
         window.title("Login")
@@ -41,7 +43,9 @@ class App:
 
         def _close() -> None:
             window.destroy()
-            self.show_window_1(user_name.get_value(), password.get_value())
+            self._show_main_window(
+                user_name.get_initial_value(), password.get_initial_value()
+            )
 
         login_frame.get_submit_button().config(command=_close)
         window.mainloop()

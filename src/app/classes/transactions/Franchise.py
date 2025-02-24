@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import StrEnum
 
-class Franchise(Enum):
+class Franchise(StrEnum):
     VISA = "VISA"
     MASTERCARD = "MASTERCARD"
     AMERICAN_EXPRESS = "AMERICAN EXPRESS"

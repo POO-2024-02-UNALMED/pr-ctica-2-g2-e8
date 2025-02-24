@@ -1,24 +1,40 @@
-from app.ui.Input import Input
 from app.ui.FieldFrame import FieldFrame
-from app.ui.DropdownPublisher import DropdownPublisher
-from app.ui.DropdownObserver import DropdownObserver
 from app.classes.customers import User
 
 from collections.abc import Callable
-from tkinter import messagebox, Tk, Menu, StringVar, ttk, X, Label
+from tkinter import messagebox, Tk, Menu, Text, Frame
 from typing import Literal
-from datetime import datetime
+
+from .SubscriptionPaymentProcessor import SubscriptionPaymentProcessor
+from .AddSubscriptionProcessor import AddSubscriptionProcessor
+from .AddCreditCardProcessor import AddCreditCardProcessor
+from .ChangePaymentMethodProcessor import ChangePaymentMethodProcessor
+
+from typing import Final
 
 
 class MainWindow(Tk):
+    _BG_COLOR: Final = "#1d2433"
     def __init__(self, user: User) -> None:
         super().__init__()
         self.geometry("450x450")
         self.title("Payment Manager")
         self._user = user
-        self._container = ttk.Frame(self)
+        self._container = Frame(self, bg=MainWindow._BG_COLOR)
         self.create_menu()
         self._container.pack(fill="both", expand=True)
+
+        initial_message = (
+            f"{user.get_email().capitalize()} Welcome to Payment Manager "
+            "Please select an option from the menu. "
+            "You will find available processes and queries"
+            " under the Processes and Queries menu"
+        )
+
+        text = Text(self._container, state="normal", wrap="word", height=10)
+        text.insert("1.0", initial_message)
+        text.pack(fill="both", expand=True)
+        text.config(state="disabled")
 
     def create_menu(self) -> None:
         menu_bar = Menu(self)
@@ -38,7 +54,6 @@ class MainWindow(Tk):
             "Pay subscription",
             "Exit",
         )
-
 
         for functionality in functionalities:
             process_menu.add_command(
@@ -104,95 +119,24 @@ class MainWindow(Tk):
 
         return _handle_selection
 
-    def show_add_credit_card_form(self) -> None:
-        current_date = datetime.now()
-        field_frame = FieldFrame(
-            self._container,
-            "Add Credit Card",
-            "Please enter the following information to add a new credit card",
-            "Add Credit Card",
-            "Credit Card Information",
-            (
-                Input[int](
-                    "Card Number",
-                    int,
-                    _validations=(lambda x: Input.validate_len(str(x), 5, 16),),
-                ),
-                Input[str](
-                    "Expiration Date",
-                    str,
-                    _validations=(
-                        lambda x: Input.validate_len(str(x), 5, 5),
-                        lambda x: Input.validate_in_range(int(x[:2]), 1, 12),
-                        lambda x: Input.validate_in_range(
-                            int(x[3:]), int(str(current_date.year)[2:]), None
-                        ),
-                    ),
-                ),
-                Input[int](
-                    "Security Code",
-                    int,
-                    _validations=(lambda x: Input.validate_len(str(x), 3, 5),),
-                ),
-                Input[str](
-                    "Card Holder Name",
-                    str,
-                    _validations=(lambda x: Input.validate_len(x, 5, 50),),
-                ),
-            ),
-        )
-        field_frame.grid(row=0, column=0)
+    def show_add_credit_card_form(self) -> FieldFrame:
+        AddCreditCardProcessor(self._user).show_add_credit_card_form(self._container)
 
-    def show_add_subscription_form(self) -> None: ...
-    def show_change_payment_method_form(self) -> None: ...
+    def show_add_subscription_form(self) -> None:
+        AddSubscriptionProcessor(self._user, self._container)
+
+    def show_change_payment_method_form(self) -> None:
+        ChangePaymentMethodProcessor(self._user, self._container)
+
     def show_inactivate_plan_form(self) -> None: ...
     def show_pay_subscription_form(self) -> None:
-        subscriptions = ["Subscription 1", "Subscription 2", "Subscription 3"]
-        subscriptions_payment_methods = {
-            "Subscription 1": ["Credit Card1", "Debit Card1", "Cash1"],
-            "Subscription 2": ["Credit Card2", "Debit Card2", "Cash2"],
-            "Subscription 3": ["Credit Card3", "Debit Card3", "Cash3"],
-        }
-
-        subscriptions_dropdown = DropdownPublisher(
-            self._container,
-            "Select Subscription",
-            subscriptions,
-        )
-
-        payment_method_dropdown = DropdownPublisher(
-            self._container,
-            "Select the payment method",
-            [],
-        )
-
-        subscriptions_dropdown.attach(
-            DropdownObserver(
-                payment_method_dropdown,
-                lambda subscription: subscriptions_payment_methods.get(
-                    subscription, []
-                ),
-            )
-        )
+        SubscriptionPaymentProcessor(self._user, self._container)
 
     def _pay_subscription(self, subscription: str, payment_method: str) -> None:
         messagebox.showinfo(
             "Payment",
             f"Subscription {subscription} has been paid using {payment_method}",
         )
-
-    def _show_dropdown(
-        self, label: str, values: list[str], callback: Callable[[str], None]
-    ) -> tuple[ttk.Combobox, StringVar]:
-        selected_value = StringVar()
-        Label(self, text=label).pack(fill=X, padx=5, pady=5)
-        dropdown = ttk.Combobox(
-            self, textvariable=selected_value, values=values, state="readonly"
-        )
-        dropdown.pack(fill=X, padx=5, pady=5)
-        dropdown.bind("<<ComboboxSelected>>", lambda _: callback(selected_value.get()))
-        # callback(selected_value.get())
-        return dropdown, selected_value
 
     def show_about_info(self) -> None:
         messagebox.showinfo(

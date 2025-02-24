@@ -28,26 +28,39 @@ class Input[T]:
     _entry_ref: Entry | None = None
     _error: Exception | None = None
 
-    def set_value(self) -> None:
-        """
-        Will raise ValueError if value is
-        required and not set or if value is not of the correct type
-        """
-        self._value = self.validate()
-        if self._validations:
-            for validation in self._validations:
-                if error := validation(self._value)(self._label):
-                    raise error
+    def set_value(self, value: str) -> None:
+        self.value = value
 
     def set_entry_ref(self, entry: Entry) -> Input:
         self._entry_ref = entry
         return self
 
-    def get_value(self) -> T:
+    @property
+    def value(self) -> T:
+        return self._value
+
+    @value.getter
+    def value(self) -> T:
+        self.set_value(self._entry_ref.get() if self._entry_ref else self._value)
+        return self._value
+
+    @value.setter
+    def value(self, value: T | None = None) -> None:
+        try:
+            self._value = self.validate(value)
+            if self._validations:
+                for validation in self._validations:
+                    if error := validation(self._value)(self._label):
+                        raise error
+        except AppException as e:
+            print(self._label, self._entry_ref.get())
+            self._error = e
+
+    def get_initial_value(self) -> T:
         return self._value
 
     def get_label_value_pair(self) -> tuple[str, TInputType]:
-        return self._label, self._value
+        return self._label, self.value
 
     def get_label(self) -> str:
         return self._label
@@ -56,6 +69,8 @@ class Input[T]:
         return self._disable
 
     def _cast_to_value_type(self, value: str | None) -> TInputType:
+        if not value:
+            return None
         try:
             if self._value_type is str:
                 return str(value)
@@ -66,11 +81,11 @@ class Input[T]:
         except ValueError:
             raise InvalidInputType(
                 f"Value of {self._label} should be of type {self._value_type.__name__}"
+                f" but got {type(value).__name__} '{value}'"
             )
         return value
 
-    def validate(self) -> TInputType:
-        value = self._entry_ref.get() if self._entry_ref else self._value
+    def validate(self, value: T | None) -> TInputType:
         if self._required and value is None:
             raise InputValueNotProvided(self._label)
 

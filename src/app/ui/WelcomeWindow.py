@@ -1,3 +1,6 @@
+""" import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))) """
+
 import os
 import tkinter as tk
 from tkinter import ttk
@@ -5,8 +8,10 @@ import os
 from app.ui.App import App
 
 
-class MainWindow:
-    def __init__(self):
+from collections.abc import Callable
+
+class WelcomeWindow:
+    def __init__(self, show_login_window: Callable[[], None]) -> None:
         self.root = tk.Tk()
         self.root.title("Payment Manager")
         self.root.geometry("525x450")
@@ -15,16 +20,16 @@ class MainWindow:
         self.count = 0
         self.count2 = 0
         self.IMAGES_PATH = os.path.join(os.path.dirname(__file__), "images")
+        self._show_login_window = show_login_window
 
         self.setup_ui()
 
     def get_image_path(self, image_name: str) -> str:
         return os.path.join(self.IMAGES_PATH, image_name)
 
-    def ventana2(self, event):
+    def _open_login_window(self, event):
         self.root.destroy()
-        # Aquí puedes iniciar otra ventana o realizar otra acción
-        # Por ejemplo, podrías llamar a una función de callback pasada como argumento
+        self._show_login_window()
 
     def on_enter(self, event):
         if self.count2 == 0:
@@ -152,7 +157,7 @@ class MainWindow:
         self.button.pack(fill="both", expand=True)
         self.button.bind("<Button-1>", self.hojadevida)
 
-        self.button2 = tk.Button(
+        button2 = tk.Button(
             self.frame5,
             text="Da clik\npara ingreasar al sistema",
             bg="#5F9EA0",
@@ -202,7 +207,3 @@ class MainWindow:
 
     def run(self):
         self.root.mainloop()
-
-if __name__ == "__main__":
-    window = MainWindow()
-    window.run()
