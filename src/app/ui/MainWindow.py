@@ -120,7 +120,7 @@ class MainWindow(Tk):
         return _handle_selection
 
     def show_add_credit_card_form(self) -> FieldFrame:
-        AddCreditCardProcessor.show_add_credit_card_form(self._container)
+        AddCreditCardProcessor(self._user).show_add_credit_card_form(self._container)
 
     def show_add_subscription_form(self) -> None:
         AddSubscriptionProcessor(self._user, self._container)

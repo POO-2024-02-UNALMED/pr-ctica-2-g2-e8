@@ -4,8 +4,10 @@ from app.classes.exceptions import AppException
 from app.ui.Input import Input
 
 from collections.abc import Callable
-from tkinter import Frame, Label, Entry, Button, Event, messagebox, TclError
+from tkinter import Frame, Label, Button, Event, messagebox, TclError
 from typing import Final
+
+from .EntryInput import EntryInPut
 
 
 class FieldFrame(Frame):
@@ -27,8 +29,7 @@ class FieldFrame(Frame):
         )
         self._criteria_title = criteria_title
         self._inputs_title = inputs_title
-        self._inputs = inputs
-        self._entries: list[Entry] = []
+        self._entries: list[EntryInPut] = []
         self._submit_button: Button | None = None
         self._reset_button: Button | None = None
 
@@ -40,7 +41,6 @@ class FieldFrame(Frame):
             self.grid_columnconfigure(0, weight=1)
         except TclError:
             pass
-
 
         Label(self, text=title, bg=FieldFrame._BG_COLOR, font=FieldFrame._FONT).grid(
             row=0,
@@ -64,10 +64,10 @@ class FieldFrame(Frame):
             pady=FieldFrame._GAP,
             padx=FieldFrame._GAP,
         )
-        self.create_grid()
+        self.create_grid(inputs)
         self.add_submit_and_reset_buttons(self._handle_submit, self._handle_reset)
 
-    def create_grid(self) -> None:
+    def create_grid(self, inputs: list[Input]) -> None:
         Label(
             self,
             text=self._criteria_title,
@@ -95,7 +95,7 @@ class FieldFrame(Frame):
             padx=FieldFrame._GAP,
         )
 
-        for i, input in enumerate(self._inputs):
+        for i, input in enumerate(inputs):
             Label(
                 self,
                 text=input.get_label(),
@@ -109,7 +109,7 @@ class FieldFrame(Frame):
                 padx=FieldFrame._GAP,
             )
 
-            entry = Entry(self, bg="#161a26", font=FieldFrame._FONT)
+            entry = EntryInPut(self, input)
             entry.grid(
                 row=i + 2,
                 column=1,
@@ -117,12 +117,7 @@ class FieldFrame(Frame):
                 pady=FieldFrame._GAP,
                 padx=FieldFrame._GAP,
             )
-            if input_value := input.get_value():
-                entry.insert(0, str(input_value))
-            entry.config(state="disabled" if input.is_disabled() else "normal")
-
             self._entries.append(entry)
-            input.set_entry_ref(entry)
 
     def add_submit_and_reset_buttons(
         self,
@@ -131,7 +126,7 @@ class FieldFrame(Frame):
     ) -> None:
         button_frame = Frame(self, bg=FieldFrame._BG_COLOR)
         button_frame.grid(
-            row=len(self._inputs) + 2,
+            row=len(self._entries) + 2,
             column=0,
             columnspan=2,
             sticky="nsew",
@@ -164,21 +159,23 @@ class FieldFrame(Frame):
         return self._reset_button
 
     def _handle_submit(self, _: Event[Button]) -> Button:
-        for input in self._inputs:
+        for entry in self._entries:
             try:
-                input.set_value()
+                entry.get_input().set_value(entry.get())
             except AppException as e:
                 messagebox.showerror("Error", str(e))
                 break
 
         return self._submit_button
 
-    def get_values(self) -> tuple[tuple[str, str | int | float | None], ...]:
-        return tuple(input.get_label_value_pair() for input in self._inputs)
+    def get_values(self) -> tuple[str, str | int | float | None]:
+        return tuple(entry.get_value() for entry in self._entries)
 
     def get_value(self, label: str) -> str | int | float | None:
-        _input = next(filter(lambda x: x.get_label() == label, self._inputs), None)
-        return _input.get_value() if _input else None
+        _entry = next(
+            filter(lambda x: x.get_input().get_label() == label, self._entries), None
+        )
+        return _entry.get_value() if _entry else None
 
     def get_submit_button(self) -> Button:
         return self._submit_button

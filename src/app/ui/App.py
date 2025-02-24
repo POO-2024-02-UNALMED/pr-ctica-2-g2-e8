@@ -42,7 +42,9 @@ class App:
 
         def _close() -> None:
             window.destroy()
-            self._show_main_window(user_name.get_value(), password.get_value())
+            self._show_main_window(
+                user_name.get_initial_value(), password.get_initial_value()
+            )
 
         login_frame.get_submit_button().config(command=_close)
         window.mainloop()

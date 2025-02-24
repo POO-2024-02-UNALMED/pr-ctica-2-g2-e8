@@ -1,5 +1,5 @@
-from tkinter import ttk, Frame, messagebox
-from app.classes.plans import Plan, Subscription
+from tkinter import Frame, messagebox, Button
+from app.classes.plans import Plan
 from app.classes.customers import User
 from app.ui.DropdownPublisher import DropdownPublisher
 
@@ -10,16 +10,37 @@ class AddSubscriptionProcessor(Frame):
         self._user = user
         self._container = container
         self._subscriptions = self._user.get_subscriptions()
-        self._selected_subscription: Subscription | None = None
-        self._subscriptions_dropdown: DropdownPublisher | None = None
-        self._payment_method_dropdown: DropdownPublisher | None = None
+        self._pan_selector: DropdownPublisher | None = None
+        self._payment_method_selector: DropdownPublisher | None = None
         self._confirm: DropdownPublisher | None = None
 
         self._show_add_subscription_form()
 
     def _handle_submit(self) -> None:
-        if not self._subscriptions_dropdown.state:...
+        if self._confirm.state != "Yes":
+            messagebox.showinfo("Error", "Confirmation is required")
+            return
 
+        try:
+            plan = Plan.get_plan(self._pan_selector.state)
+            if not plan:
+                messagebox.showinfo("Error", "Plan not found")
+                return
+
+            payment_method = next(
+                (
+                    payment_method
+                    for payment_method in self._user.get_payment_methods()
+                    if payment_method.get_description()
+                    == self._payment_method_selector.state
+                )
+            )
+            if self._user.add_subscription(plan, payment_method).get_status() == "ACTIVE":
+                messagebox.showinfo("Success", "Subscription added successfully")
+            else:
+                messagebox.showinfo("Error", "Subscription not added")
+        except StopIteration:
+            messagebox.showinfo("Error", "Select payment method")
 
     def _show_add_subscription_form(self) -> None:
         subscribed_plans = self._user.get_user_subscribed_plans()
@@ -29,13 +50,13 @@ class AddSubscriptionProcessor(Frame):
             messagebox.showinfo("Add Subscription", "No available plans to subscribe")
             return
 
-        self._subscriptions_dropdown = DropdownPublisher(
+        self._pan_selector = DropdownPublisher(
             self._container,
             "Select the plan you want to add REQUIRED",
             (plan for plan in available_plans),
         )
 
-        self._payment_method_dropdown = DropdownPublisher(
+        self._payment_method_selector = DropdownPublisher(
             self._container,
             "Select the payment method REQUIRED",
             (
@@ -49,4 +70,4 @@ class AddSubscriptionProcessor(Frame):
             "We will charge the subscription  REQUIRED",
             (opt for opt in ("Yes", "No")),
         )
-        ttk.Button(self._container, text="Pay", command=self._handle_submit).pack()
+        Button(self._container, text="Pay", command=self._handle_submit).pack()

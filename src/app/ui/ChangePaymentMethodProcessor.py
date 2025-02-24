@@ -1,8 +1,10 @@
-from tkinter import Frame, messagebox
+from tkinter import Frame, messagebox, Button
 from app.classes.customers import User
 from app.ui.DropdownPublisher import DropdownPublisher
 from .EventListener import EventListener
 from .AddCreditCardProcessor import AddCreditCardProcessor
+
+from collections.abc import Generator
 
 
 class ChangePaymentMethodProcessor(Frame):
@@ -12,47 +14,54 @@ class ChangePaymentMethodProcessor(Frame):
         self._container = container
         self._subscriptions_dropdown: DropdownPublisher | None = None
         self._payment_method_dropdown: DropdownPublisher | None = None
+        self._generator_ref: Generator[None, None, None] | None = None
 
         self._show_change_payment_method_form()
 
-    def _handle_selection(self, payment_method: str) -> None:
-        if payment_method == "Add new credit card":
-            frame = Frame(self._container)
-            frame.pack()
-            field_frame = AddCreditCardProcessor.show_add_credit_card_form(frame)
-            field_frame.pack()
-            field_frame.get_submit_button().config(
-                command=lambda: self._add_credit_card_to_subscription(
-                    field_frame.get_inputs()
-                )
+    def _handle_selection(self, payment_method: str) -> Generator[None, None, None]:
+        try:
+            selected_subscription = next(
+                _subscription
+                for _subscription in self._user.get_subscriptions()
+                if _subscription.get_plan().get_name()
+                == self._subscriptions_dropdown.state
             )
-        else:
-            try:
-                selected_subscription = next(
-                    _subscription
-                    for _subscription in self._user.get_subscriptions()
-                    if _subscription.get_plan().get_name()
-                    == self._subscriptions_dropdown.state
-                )
+            if payment_method == "Add new credit card":
+                frame = Frame(self._container)
+                frame.pack()
+                add_card_processor = AddCreditCardProcessor(self._user)
+                field_frame = add_card_processor.show_add_credit_card_form(frame)
+                field_frame.get_submit_button().config(text="Validate Card")
+                field_frame.pack()
+                yield None
+                selected_payment_method = add_card_processor.get_card()
+            else:
                 selected_payment_method = next(
                     _payment_method
                     for _payment_method in self._user.get_payment_methods()
                     if _payment_method.get_description() == payment_method
                 )
-                if selected_subscription.upsert_payment_method(
-                    selected_payment_method
-                ):
-                    messagebox.showinfo(
-                        "Payment Method",
-                        f"Payment method has been updated to {payment_method}",
-                    )
-                self._subscriptions_dropdown.clear()
-            except StopIteration:
+        except StopIteration:
+            messagebox.showerror(
+                "Missing Selection",
+                "Please fill all fields",
+            )
+        else:
+            self._add_submit_button()
+            if not selected_payment_method:
                 messagebox.showerror(
                     "Missing Selection",
-                    "Please select a subscription",
+                    "Please provide a payment method",
                 )
 
+            elif selected_subscription.upsert_payment_method(selected_payment_method):
+                messagebox.showinfo(
+                    "Payment Method",
+                    f"Payment method has been updated to {selected_payment_method.get_description()}",
+                )
+                self._subscriptions_dropdown.clear()
+
+        yield None
 
     def _show_change_payment_method_form(self) -> None:
         self._subscriptions_dropdown = DropdownPublisher(
@@ -70,4 +79,16 @@ class ChangePaymentMethodProcessor(Frame):
             ),
         )
 
-        self._payment_method_dropdown.attach(EventListener(self._handle_selection))
+        def _set_generator_ref(selection: str) -> None:
+            self._generator_ref = self._handle_selection(selection)
+            return next(self._generator_ref)
+
+        self._payment_method_dropdown.attach(EventListener(_set_generator_ref))
+
+
+    def _add_submit_button(self) -> None:
+        Button(
+            self._container,
+            text="Submit",
+            command=lambda: next(self._generator_ref),
+        ).pack()
