@@ -1,16 +1,15 @@
 import os
 import tkinter as tk
 from tkinter import ttk
-import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
-from app.ui import App
+from app.ui.App import App
+
 
 class MainWindow:
     def __init__(self):
         self.root = tk.Tk()
         self.root.title("Payment Manager")
-        self.root.geometry("450x450")
+        self.root.geometry("525x450")
         self.root.configure(bg="#4682B4")
         self._container = ttk.Frame(self.root)
         self.count = 0
@@ -77,9 +76,15 @@ class MainWindow:
 
     def evento(self):
         self.root.destroy()
-        window = App()
-        window.run()
-        
+        print("Appse")
+        app = App()
+        app.run()
+    
+    def eventooo(self, event):
+        self.root.destroy()
+        print("Appse")
+        app = App()
+        app.run()
 
     def des(self, event, jk, kl):
         kl.destroy()
@@ -115,7 +120,7 @@ class MainWindow:
 
         menu1 = tk.Menu(menubar)
         menubar.add_cascade(label="MENU", menu=menu1, command=self.evento)
-        menu1.add_command(label="Salir", command=self.evento)
+        menu1.add_command(label="Salir", command=self.des)
         menu1.add_separator()
         menu1.add_command(label="descripcion del programa", command=self.evento2)
 
@@ -155,7 +160,7 @@ class MainWindow:
             font=("roboto", 13),
         )
         self.button2.pack(fill="both", expand=True)
-        self.button2.bind("<Button-1>", self.ventana2)
+        self.button2.bind("<Button-1>", self.eventooo)
 
         self.label = tk.Label(
             self.frame3,

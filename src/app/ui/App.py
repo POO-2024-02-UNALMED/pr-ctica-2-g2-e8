@@ -9,6 +9,7 @@ from typing import cast
 
 
 class App:
+    print("App")
     def __init__(self) -> None:
         self.show_login_window()
 
