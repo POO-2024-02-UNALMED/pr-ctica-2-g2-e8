@@ -72,10 +72,10 @@ class WelcomeWindow:
                 text="Oscar Fabian Rojas Baquero\n19 años\nciencias De La Computacion\nMaestro pokemon",
                 bg="gray",
             )
-            self.image.config(file=self.get_image_path("descarga.png"))
-            self.image2.config(file=self.get_image_path("images.png"))
-            self.image3.config(file=self.get_image_path("images(1).png"))
-            self.image4.config(file=self.get_image_path("images(2).png"))
+            self.image.config(file=self.get_image_path("Oscar1.png"))
+            self.image2.config(file=self.get_image_path("Oscar2.png"))
+            self.image3.config(file=self.get_image_path("Oscar3.png"))
+            self.image4.config(file=self.get_image_path("Oscar4.png"))
             self.count = 0
 
     def evento(self):
