@@ -125,6 +125,7 @@ class SubscriptionPaymentProcessor(Frame):
                 pady=Style.GAP,
                 font=Style.FONT,
                 bg=Style.BG_COLOR,
+                fg=Style.FG_COLOR,
             ).pack()
         else:
             Label(self._container, text="Payment has been rejected", pady=1, fg=Style.FG_COLOR).pack()
