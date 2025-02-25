@@ -1,11 +1,10 @@
-""" import sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))) """
-
+import sys
 import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))) 
+
 import tkinter as tk
 from tkinter import ttk
-import os
-from app.ui.App import App
+
 
 
 from collections.abc import Callable
@@ -82,14 +81,15 @@ class WelcomeWindow:
     def evento(self):
         self.root.destroy()
         print("Appse")
-        app = App()
-        app.run()
+        
     
     def eventooo(self, event):
         self.root.destroy()
+        from src.app.App import App
+        App = App()
+        App.run()
         print("Appse")
-        app = App()
-        app.run()
+        
 
     def des(self, event, jk, kl):
         kl.destroy()
@@ -125,7 +125,7 @@ class WelcomeWindow:
 
         menu1 = tk.Menu(menubar)
         menubar.add_cascade(label="MENU", menu=menu1, command=self.evento)
-        menu1.add_command(label="Salir", command=self.des)
+        menu1.add_command(label="Salir", command=self.evento)
         menu1.add_separator()
         menu1.add_command(label="descripcion del programa", command=self.evento2)
 
@@ -157,7 +157,7 @@ class WelcomeWindow:
         self.button.pack(fill="both", expand=True)
         self.button.bind("<Button-1>", self.hojadevida)
 
-        button2 = tk.Button(
+        self.button2 = tk.Button(
             self.frame5,
             text="Da clik\npara ingreasar al sistema",
             bg="#5F9EA0",
@@ -165,7 +165,7 @@ class WelcomeWindow:
             font=("roboto", 13),
         )
         self.button2.pack(fill="both", expand=True)
-        self.button2.bind("<Button-1>", self.eventooo)
+        self.button2.bind("<Button-2>", self.eventooo)
 
         self.label = tk.Label(
             self.frame3,
@@ -179,19 +179,19 @@ class WelcomeWindow:
         self.frameima = tk.Frame(self.frame1)
         self.frameima.place(relx=0, rely=0.4, relwidth=1, relheight=0.6)
 
-        self.image = tk.PhotoImage(file=self.get_image_path("descarga.png"))
+        self.image = tk.PhotoImage(file=self.get_image_path("Oscar1.png"))
         self.label = ttk.Label(self.frameima, image=self.image, background="black")
         self.label.grid(column=0, row=0, sticky="nsew")
 
-        self.image2 = tk.PhotoImage(file=self.get_image_path("images.png"))
+        self.image2 = tk.PhotoImage(file=self.get_image_path("Oscar2.png"))
         self.label2 = ttk.Label(self.frameima, image=self.image2, background="black")
         self.label2.grid(column=1, row=0, sticky="nsew")
 
-        self.image3 = tk.PhotoImage(file=self.get_image_path("images(1).png"))
+        self.image3 = tk.PhotoImage(file=self.get_image_path("Oscar3.png"))
         self.label3 = ttk.Label(self.frameima, image=self.image3, background="black")
         self.label3.grid(column=0, row=1, sticky="nsew")
 
-        self.image4 = tk.PhotoImage(file=self.get_image_path("images(2).png"))
+        self.image4 = tk.PhotoImage(file=self.get_image_path("Oscar4.png"))
         self.label4 = ttk.Label(self.frameima, image=self.image4, background="black")
         self.label4.grid(column=1, row=1, sticky="nsew")
 
