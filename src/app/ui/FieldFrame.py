@@ -25,10 +25,7 @@ class FieldFrame(Frame):
         inputs_title: str,
         inputs: tuple[Input, ...],
     ) -> None:
-        super().__init__(
-            master, bg=FieldFrame._BG_COLOR,bd=1, relief="solid", padx=10, pady=10
-            
-        )
+        super().__init__(master, bg=FieldFrame._BG_COLOR, bd=1, relief="solid")
         self._criteria_title = criteria_title
         self._inputs_title = inputs_title
         self._entries: list[EntryInPut] = []
@@ -44,7 +41,13 @@ class FieldFrame(Frame):
         except TclError:
             pass
 
-        Label(self, text=title, bg=FieldFrame._BG_COLOR, fg=FieldFrame._FG_COLOR ,font=FieldFrame._FONT).grid(
+        Label(
+            self,
+            text=title,
+            bg=FieldFrame._BG_COLOR,
+            fg=FieldFrame._FG_COLOR,
+            font=FieldFrame._FONT,
+        ).grid(
             row=0,
             column=0,
             columnspan=2,
@@ -122,7 +125,6 @@ class FieldFrame(Frame):
                 sticky="nsew",
                 pady=FieldFrame._GAP,
                 padx=FieldFrame._GAP,
-                
             )
             self._entries.append(entry)
 
@@ -186,7 +188,12 @@ class FieldFrame(Frame):
 
     def get_submit_button(self) -> Button:
         return self._submit_button
-    
+
     def reset_entries(self) -> None:
         for entry in self._entries:
             entry.clear()
+
+    def clear(self) -> None:
+        self.reset_entries()
+        self._submit_button.config(state="normal")
+        self._reset_button.config(state="normal")

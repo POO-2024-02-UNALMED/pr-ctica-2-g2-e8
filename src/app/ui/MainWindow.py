@@ -10,15 +10,17 @@ from .AddSubscriptionProcessor import AddSubscriptionProcessor
 from .AddCreditCardProcessor import AddCreditCardProcessor
 from .ChangePaymentMethodProcessor import ChangePaymentMethodProcessor
 from .DeactivatePlanProcessor import DeactivatePlanProcessor
+from .Style import Style
 
 from typing import Final
 
 
 class MainWindow(Tk):
-    _BG_COLOR: Final = "#1d2433"
+    _BG_COLOR: Final = Style.BG_COLOR
 
-    def __init__(self, user: User) -> None:
+    def __init__(self, user: User, callback: Callable[[None], None]) -> None:
         super().__init__()
+        self._callback = callback
         self.geometry("450x450")
         self.title("Payment Manager")
         self._user = user
@@ -33,10 +35,48 @@ class MainWindow(Tk):
             " under the Processes and Queries menu"
         )
 
-        text = Text(self._container, state="normal", wrap="word", height=10)
+        text = Text(self._container, wrap="word", bg=MainWindow._BG_COLOR, height=4)
         text.insert("1.0", initial_message)
-        text.pack(fill="both", expand=True)
+        text.pack()
         text.config(state="disabled")
+        self._show_user_subscription()
+        self._show_user_credit_cards()
+
+    def _show_user_subscription(self) -> None:
+        user_subscriptions = self._user.get_subscriptions()
+        text = Text(self._container, wrap="word", bg=MainWindow._BG_COLOR)
+        text.insert("end", "Subscribed plans: \n")
+        text.insert("end", "Plan | Status | Next charge date \n")
+        text.insert("end", "-" * 50 + "\n")
+        for subs in user_subscriptions:
+            text.insert(
+                "end",
+                (
+                    f"{subs.get_plan().get_name()} | {subs.get_status()} |"
+                    f"{subs.get_next_charge_date().date().isoformat()}\n"
+                ),
+            )
+            text.insert("end", "-" * 50 + "\n")
+        text.pack()
+        text.config(state="disabled", height=len(user_subscriptions) * 2 + 3)
+
+    def _show_user_credit_cards(self) -> None:
+        user_credit_cards = self._user.get_payment_methods()
+        text = Text(self._container, wrap="word", bg=MainWindow._BG_COLOR)
+        text.insert("end", "Credit cards: \n")
+        text.insert("end", "-" * 50 + "\n")
+        for card in user_credit_cards:
+            text.insert(
+                "end",
+                f"{card.get_description()}\n",
+            )
+            text.insert("end", "-" * 50 + "\n")
+        text.pack()
+        text.config(state="disabled")
+
+    def _go_back_to_welcome(self) -> None:
+        self.destroy()
+        self._callback()
 
     def create_menu(self) -> None:
         menu_bar = Menu(self)
@@ -44,7 +84,7 @@ class MainWindow(Tk):
 
         file_menu = Menu(menu_bar)
         file_menu.add_command(label="App", command=self.show_application_info)
-        file_menu.add_command(label="Exit", command=self.quit)
+        file_menu.add_command(label="Exit", command=self._go_back_to_welcome)
         menu_bar.add_cascade(label="File", menu=file_menu)
 
         process_menu = Menu(menu_bar)
@@ -108,7 +148,7 @@ class MainWindow(Tk):
             case "Pay subscription":
                 self.show_pay_subscription_form()
             case "Exit":
-                self.quit()
+                self.destroy()
 
     def _clean_container(self) -> None:
         for widget in self._container.winfo_children():
@@ -131,7 +171,7 @@ class MainWindow(Tk):
         ChangePaymentMethodProcessor(self._user, self._container)
 
     def show_inactivate_plan_form(self) -> None:
-        DeactivatePlanProcessor(self._container).process()
+        DeactivatePlanProcessor(self._container).show_form()
 
     def show_pay_subscription_form(self) -> None:
         SubscriptionPaymentProcessor(self._user, self._container)

@@ -37,14 +37,11 @@ class User(Customer):
         self.save_on_repository_and_add_to_subscriptions(subscription)
         return initial_charge_transaction
 
-    def get_user_subscribed_plans(self) -> list[str]:
+    def get_user_subscribed_plans(self) -> tuple[str, ...]:
         user_subscriptions = self.get_subscriptions()
-        plans: list[str] = []
-        for subscription in user_subscriptions:
-            plans.append(subscription.get_plan())
-        return plans
+        return tuple(sub.get_plan().get_name() for sub in user_subscriptions)
 
-    def _load_subscription(self, plan: Plan) -> Subscription | None:
+    def _load_active_subscription(self, plan: Plan) -> Subscription | None:
         subscription = Repository.load(
             Subscription.DB_PATH + os.path.sep + plan.get_name(),
             WithId.create_id(self._email, plan.get_name()),
@@ -53,8 +50,9 @@ class User(Customer):
             return None
 
         subscription = cast(Subscription, subscription)
-        subscription.set_user(self)
-        subscription.set_plan(plan)
+        if subscription.get_status() == SubscriptionStatus.INACTIVE:
+            return None
+
         if subscription.get_next_charge_date().timestamp() < datetime.now().timestamp():
             subscription.set_status(SubscriptionStatus.CANCELLED)
             subscription.set_suspension_date(subscription.get_next_charge_date())
@@ -68,7 +66,7 @@ class User(Customer):
     def get_subscriptions(self) -> tuple[Subscription, ...]:
         plans = Plan.get_all()
         user_subscriptions = (
-            self._load_subscription(plan) for plan in plans
+            self._load_active_subscription(plan) for plan in plans
         )
         self._subscriptions = tuple(subs for subs in user_subscriptions if subs)
         return self._subscriptions
@@ -97,7 +95,7 @@ class User(Customer):
     def remove_credit_card(self, card):
         Repository.delete(card, "Card" + os.path.sep + self.get_id())
 
-    def get_payment_methods(self) -> tuple[Card]:
+    def get_payment_methods(self) -> tuple[Card, ...]:
         cards = Repository.load_all_object_in_directory(
             "Card" + os.path.sep + self.get_id()
         )

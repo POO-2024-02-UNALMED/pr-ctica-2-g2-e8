@@ -120,7 +120,7 @@ class Subscription(WithId):
     def get_next_charge_date(self):
         return self.next_charge_date
 
-    def get_status(self):
+    def get_status(self) -> SubscriptionStatus:
         return self.status
 
     def set_status(self, status):

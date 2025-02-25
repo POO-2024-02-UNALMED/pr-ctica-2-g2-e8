@@ -1,7 +1,10 @@
+from tkinter import ttk, Label, Frame, messagebox, Text
 from collections.abc import Generator
-from tkinter import ttk, Label, Frame, messagebox
-from app.ui.DropdownPublisher import DropdownPublisher
-from app.ui.DropdownObserver import DropdownObserver
+
+from .DropdownPublisher import DropdownPublisher
+from .DropdownObserver import DropdownObserver
+from .Style import Style
+
 from app.classes.transactions import Transaction, TransactionStatus
 from app.classes.customers import User
 from app.classes.plans import Subscription
@@ -18,6 +21,7 @@ class SubscriptionPaymentProcessor(Frame):
         self._payment_method_dropdown: DropdownPublisher | None = None
         self._number_of_payments_dropdown: DropdownPublisher | None = None
 
+        self._show_informative_banner()
         self._show_pay_subscription_form()
 
     def _get_payments_values(
@@ -51,19 +55,19 @@ class SubscriptionPaymentProcessor(Frame):
     def _show_pay_subscription_form(self) -> None:
         self._subscriptions_dropdown = DropdownPublisher(
             self._container,
-            "Select Subscription REQUIRED",
+            "Select Subscription",
             (_subs.get_plan().get_name() for _subs in self._subscriptions),
         )
 
         self._payment_method_dropdown = DropdownPublisher(
             self._container,
-            "Select the payment method REQUIRED",
+            "Select the payment method",
             (_ for _ in ()),
         )
 
         self._number_of_payments_dropdown = DropdownPublisher(
             self._container,
-            "Number of payments REQUIRED",
+            "Number of payments",
             (_ for _ in ()),
         )
 
@@ -90,7 +94,6 @@ class SubscriptionPaymentProcessor(Frame):
         except StopIteration:
             messagebox.showerror("Error", "Please fill all the required fields")
 
-
     def _process_payment(self) -> None:
         subscription = next(
             _subs
@@ -100,8 +103,7 @@ class SubscriptionPaymentProcessor(Frame):
         payment_method = next(
             card
             for card in subscription.get_payment_methods()
-            if card.get_description()
-            == self._payment_method_dropdown.state
+            if card.get_description() == self._payment_method_dropdown.state
         )
         number_of_payments = int(
             self._number_of_payments_dropdown.state.split(" - ")[0].strip()
@@ -120,22 +122,42 @@ class SubscriptionPaymentProcessor(Frame):
             Label(
                 self._container,
                 text=f"Payment of {plan_name} has been processed",
+                pady=1
             ).pack()
         else:
-            Label(self._container, text="Payment has been rejected").pack()
+            Label(self._container, text="Payment has been rejected", pady=1).pack()
 
         if (
             number_of_payments > 1
             or transaction.get_status() != TransactionStatus.ACCEPTED
         ):
             for _transaction in subscription.get_pending_transactions():
-                Label(
+                _text = Text(
                     self._container,
-                    text=(
-                        f"Next charge date: {_transaction.get_charge_date()} total: {_transaction.get_total()}"
+                    wrap="word",
+                    bg=Style.BG_COLOR,
+                    height=2,
+                )
+                _text.insert(
+                    "end",
+                    (
+                        f"Next charge date: {_transaction.get_charge_date()} "
+                        f"total: {_transaction.get_total()} "
                         f"- plan: {subscription.get_plan().get_name()}"
                     ),
-                ).pack()
+                )
 
         self._number_of_payments_dropdown.clear()
         self._payment_method_dropdown.clear()
+
+    def _show_informative_banner(self) -> None:
+        text = Text(self._container, wrap="word", bg=Style.BG_COLOR, height=6)
+        text.insert(
+            "end",
+            "Pay Subscription\n"
+            "Select the subscription you want to pay and the payment method you want to use"
+            "You can also select the number of payments you want to make"
+            "If you select more than one payment, the total will be divided into equal parts",
+        )
+        text.pack()
+        text.config(state="disabled")

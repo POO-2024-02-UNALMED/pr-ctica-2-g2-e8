@@ -120,4 +120,4 @@ class Repository:
 
     @staticmethod
     def set_debug_mode(debug: bool) -> None:
-        Repository.LOGGER.setLevel(logging.DEBUG if debug else logging.OFF)
+        Repository.LOGGER.disabled = not debug

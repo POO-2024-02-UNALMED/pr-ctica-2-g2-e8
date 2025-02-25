@@ -1,8 +1,9 @@
-from app.classes.plans import Plan, Subscription
-from app.ui.DropdownPublisher import DropdownPublisher
 from tkinter import Button, Text, messagebox, Misc
+from app.classes.plans import Plan, Subscription
 
+from .DropdownPublisher import DropdownPublisher
 from .EventListener import EventListener
+from .Style import Style
 
 from collections.abc import Callable
 
@@ -14,7 +15,8 @@ class DeactivatePlanProcessor:
         self._container: Misc = container
         self._submit_button: Button = Button(self._container, text="Deactivate")
 
-    def process(self) -> None:
+    def show_form(self) -> None:
+        self._show_informative_banner()
         plans = Plan.get_all()
         self._plans_dropdown = DropdownPublisher(
             self._container,
@@ -22,7 +24,7 @@ class DeactivatePlanProcessor:
             (_plan.get_name() for _plan in plans),
         )
 
-        deactivation_message = Text(self._container, height=2)
+        deactivation_message = Text(self._container, height=2, wrap="word", bg=Style.BG_COLOR)
         deactivation_message.insert(
             "end", "Once completed the subscriptions will be inactivated automatically"
         )
@@ -39,13 +41,13 @@ class DeactivatePlanProcessor:
 
     def _show_submit_button(self, confirmation: str) -> None:
         self._submit_button.config(
-            command=self._deactivate,
+            command=self._deactivate_plan,
             state="normal" if confirmation == "Yes" else "disabled",
         )
 
         self._submit_button.pack()
 
-    def _deactivate(self) -> Callable[[], None]:
+    def _deactivate_plan(self) -> Callable[[], None]:
         print(self._plans_dropdown.state, "deactivate")
         plan = Plan.get_plan(self._plans_dropdown.state)
         if not plan:
@@ -67,3 +69,13 @@ class DeactivatePlanProcessor:
         text.config(state="disabled")
         self._confirm.clear()
         self._plans_dropdown.clear()
+
+    def _show_informative_banner(self) -> None:
+        text = Text(self._container, wrap="word", bg=Style.BG_COLOR, height=3)
+        text.insert(
+            "end",
+            "Deactivate Plan \n"
+            "Select the plan you want to deactivate and confirm the action",
+        )
+        text.pack()
+        text.config(state="disabled")

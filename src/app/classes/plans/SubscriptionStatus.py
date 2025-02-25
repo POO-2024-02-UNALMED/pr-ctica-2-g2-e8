@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import StrEnum
 
-class SubscriptionStatus(Enum):
+class SubscriptionStatus(StrEnum):
     ACTIVE = "ACTIVE"
     INACTIVE = "INACTIVE"
     CANCELLED = "CANCELLED"

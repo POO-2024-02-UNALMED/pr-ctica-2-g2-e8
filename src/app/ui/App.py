@@ -10,7 +10,6 @@ from typing import cast
 
 
 class App:
-    print("App")
     def __init__(self) -> None:
         self._show_welcome_window()
 
@@ -20,14 +19,14 @@ class App:
             messagebox.showerror("Error", "User not found")
             return self._show_login_window()
 
-        MainWindow(cast(User, user)).run()
+        MainWindow(cast(User, user), self._show_welcome_window).run()
 
     def _show_welcome_window(self) -> None:
         WelcomeWindow(self._show_login_window).run()
 
     def _show_login_window(self) -> None:
         window = Tk()
-        window.geometry("300x270")
+        window.geometry("310x270")
         window.title("Login")
         user_name = Input[str]("UserName", str)
         password = Input[str]("Password", str)

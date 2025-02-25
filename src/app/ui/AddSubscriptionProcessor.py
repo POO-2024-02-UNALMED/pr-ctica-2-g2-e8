@@ -1,8 +1,11 @@
-from tkinter import Frame, messagebox, Button
+from tkinter import Frame, messagebox, Button, Text
 from app.classes.plans import Plan
 from app.classes.customers import User
 from app.classes.transactions import TransactionStatus
-from app.ui.DropdownPublisher import DropdownPublisher
+
+from .DropdownPublisher import DropdownPublisher
+from .Style import Style
+from .EventListener import EventListener
 
 
 class AddSubscriptionProcessor(Frame):
@@ -10,11 +13,12 @@ class AddSubscriptionProcessor(Frame):
         super().__init__(container)
         self._user = user
         self._container = container
-        self._subscriptions = self._user.get_subscriptions()
         self._pan_selector: DropdownPublisher | None = None
         self._payment_method_selector: DropdownPublisher | None = None
         self._confirm: DropdownPublisher | None = None
+        self._submit_button: Button = Button(self._container, text="Pay", state="disabled")
 
+        self._show_informative_banner()
         self._show_add_subscription_form()
 
     def _handle_submit(self) -> None:
@@ -52,7 +56,7 @@ class AddSubscriptionProcessor(Frame):
 
     def _show_add_subscription_form(self) -> None:
         subscribed_plans = self._user.get_user_subscribed_plans()
-        plans = (plan.get_name() for plan in Plan.get_all())
+        plans = tuple(plan.get_name() for plan in Plan.get_all())
         available_plans = tuple(plan for plan in plans if plan not in subscribed_plans)
         if not available_plans:
             messagebox.showinfo("Add Subscription", "No available plans to subscribe")
@@ -78,4 +82,19 @@ class AddSubscriptionProcessor(Frame):
             "We will charge the subscription  REQUIRED",
             (opt for opt in ("Yes", "No")),
         )
-        Button(self._container, text="Pay", command=self._handle_submit).pack()
+        self._confirm.attach(EventListener(self._activate_submit_button))
+        self._submit_button.pack()
+
+    def _activate_submit_button(self, confirm: str) -> None:
+        self._submit_button.config(state="normal" if confirm == "Yes" else "disabled")
+
+    def _show_informative_banner(self) -> None:
+        text = Text(self._container, wrap="word", height=4, bg=Style.BG_COLOR)
+        text.insert(
+            "end",
+            "Add Subscription\n"
+            "You can add a subscription to your account by selecting a plan and a payment method. "
+            "We will charge the subscription to the selected payment method.",
+        )
+        text.pack()
+        text.config(state="disabled")
