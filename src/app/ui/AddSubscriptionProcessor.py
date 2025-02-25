@@ -1,6 +1,7 @@
 from tkinter import Frame, messagebox, Button
 from app.classes.plans import Plan
 from app.classes.customers import User
+from app.classes.transactions import TransactionStatus
 from app.ui.DropdownPublisher import DropdownPublisher
 
 
@@ -35,12 +36,19 @@ class AddSubscriptionProcessor(Frame):
                     == self._payment_method_selector.state
                 )
             )
-            if self._user.add_subscription(plan, payment_method).get_status() == "ACTIVE":
+            if (
+                self._user.add_subscription(plan, payment_method).get_status()
+                == TransactionStatus.ACCEPTED
+            ):
                 messagebox.showinfo("Success", "Subscription added successfully")
             else:
                 messagebox.showinfo("Error", "Subscription not added")
         except StopIteration:
             messagebox.showinfo("Error", "Select payment method")
+        else:
+            self._pan_selector.clear()
+            self._payment_method_selector.clear()
+            self._confirm.clear()
 
     def _show_add_subscription_form(self) -> None:
         subscribed_plans = self._user.get_user_subscribed_plans()

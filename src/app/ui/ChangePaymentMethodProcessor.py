@@ -36,6 +36,7 @@ class ChangePaymentMethodProcessor(Frame):
                 yield None
                 selected_payment_method = add_card_processor.get_card()
             else:
+                yield None
                 selected_payment_method = next(
                     _payment_method
                     for _payment_method in self._user.get_payment_methods()
@@ -79,16 +80,33 @@ class ChangePaymentMethodProcessor(Frame):
             ),
         )
 
-        def _set_generator_ref(selection: str) -> None:
-            self._generator_ref = self._handle_selection(selection)
-            return next(self._generator_ref)
+        self._payment_method_dropdown.attach(EventListener(self._set_generator_ref))
 
-        self._payment_method_dropdown.attach(EventListener(_set_generator_ref))
-
+    def _set_generator_ref(self, selection: str) -> None:
+        self._generator_ref = self._handle_selection(selection)
+        return next(self._generator_ref)
 
     def _add_submit_button(self) -> None:
-        Button(
+        def _handle_submit() -> None:
+            try:
+                next(self._generator_ref)
+            except StopIteration:
+                self._set_generator_ref(self._payment_method_dropdown.state)
+                messagebox.showerror(
+                    "Error",
+                    "Please select a Subscription",
+                )
+
+        is_disabled = not self._subscriptions_dropdown.state or not self._payment_method_dropdown.state
+
+        self._submit_button = Button(
             self._container,
             text="Submit",
-            command=lambda: next(self._generator_ref),
-        ).pack()
+            command=lambda: next(_handle_submit),
+            state="disabled" if is_disabled else "normal",
+        )
+        self._submit_button.pack()
+
+    def _enable_submit_button(self) -> None:
+        is_disabled = not self._subscriptions_dropdown.state or not self._payment_method_dropdown.state
+        self._submit_button.config(state="disabled" if is_disabled else "normal")

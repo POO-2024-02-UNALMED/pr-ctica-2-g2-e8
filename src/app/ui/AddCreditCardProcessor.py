@@ -31,6 +31,7 @@ class AddCreditCardProcessor:
             self._user.add_credit_card(card)
             messagebox.showinfo("Success", "Credit card added successfully")
             self._card = card
+            field_frame.clear()
 
         return _add_card
 

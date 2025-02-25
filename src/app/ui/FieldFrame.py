@@ -109,7 +109,7 @@ class FieldFrame(Frame):
                 padx=FieldFrame._GAP,
             )
 
-            entry = EntryInPut(self, input)
+            entry = EntryInPut[input._value_type](self, input)
             entry.grid(
                 row=i + 2,
                 column=1,
@@ -179,3 +179,7 @@ class FieldFrame(Frame):
 
     def get_submit_button(self) -> Button:
         return self._submit_button
+    
+    def reset_entries(self) -> None:
+        for entry in self._entries:
+            entry.clear()

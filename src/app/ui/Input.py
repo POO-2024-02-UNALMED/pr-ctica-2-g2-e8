@@ -53,8 +53,8 @@ class Input[T]:
                     if error := validation(self._value)(self._label):
                         raise error
         except AppException as e:
-            print(self._label, self._entry_ref.get())
             self._error = e
+            raise e
 
     def get_initial_value(self) -> T:
         return self._value
@@ -86,10 +86,15 @@ class Input[T]:
         return value
 
     def validate(self, value: T | None) -> TInputType:
-        if self._required and value is None:
+        if self._required and not value:
             raise InputValueNotProvided(self._label)
 
         return self._cast_to_value_type(value)
+
+    def clear(self) -> None:
+        self._entry_ref.delete(0, "end")
+        self._value = None
+        self._error = None
 
     @staticmethod
     def validate_len(

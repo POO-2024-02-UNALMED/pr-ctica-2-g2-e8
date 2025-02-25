@@ -27,3 +27,6 @@ class EntryInPut[T](Entry):
 
     def get_input(self) -> Input[T]:
         return self._input
+
+    def clear(self) -> None:
+        self._input.clear()
