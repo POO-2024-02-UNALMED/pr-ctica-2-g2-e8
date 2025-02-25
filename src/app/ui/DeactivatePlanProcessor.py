@@ -1,19 +1,20 @@
-from tkinter import Button, Text, messagebox, Misc
+from tkinter import Button, Text, messagebox, Misc, Label
 from app.classes.plans import Plan, Subscription
 
 from .DropdownPublisher import DropdownPublisher
 from .EventListener import EventListener
 from .Style import Style
-
+from .EntryInput import EntryInPut
+from .Input import Input
 from collections.abc import Callable
 
 
 class DeactivatePlanProcessor:
     def __init__(self, container: Misc) -> None:
         self._plans_dropdown: DropdownPublisher | None = None
-        self._confirm: DropdownPublisher | None = None
         self._container: Misc = container
         self._submit_button: Button = Button(self._container, text="Deactivate")
+        self._message: Text = Text(self._container, wrap="word", bg=Style.BG_COLOR, font=Style.FONT)
 
     def show_form(self) -> None:
         self._show_informative_banner()
@@ -30,32 +31,48 @@ class DeactivatePlanProcessor:
             "end", "Once completed the subscriptions will be inactivated automatically"
         )
         deactivation_message.pack()
-        deactivation_message.config(state="disabled")
+        deactivation_message.config(state="disabled", fg=Style.FG_COLOR)
 
-        self._confirm = DropdownPublisher(
-            self._container,
-            "Confirm?",
-            lambda _: (opt for opt in ("Yes", "No")),
+        expiration_date = Input[str](
+            "Ingresa el nombre del plan",
+            str,
+            _validations=(
+                self.validadeconfirmation,
+            ),
         )
 
-        self._confirm.attach(EventListener(self._show_submit_button))
+        label = Label(self._container, text="Ingresa el nombre del plan", bg=Style.BG_COLOR, fg=Style.FG_COLOR, font=Style.FONT)
+        label.pack()
 
-    def _show_submit_button(self, confirmation: str) -> None:
+        input = EntryInPut(self._container, expiration_date)
+        input.pack()
+        input.config(fg="black")
+
+        self._show_submit_button()
+        
+    def validadeconfirmation(self, confirmation: str) -> None:
+        if confirmation != self._plans_dropdown.state:
+            messagebox.showerror("Error", "Confirmation does not match the plan")
+            return
+
+    def _show_submit_button(self) -> None:
         self._submit_button.config(
             command=self._deactivate_plan,
-            state="normal" if confirmation == "Yes" else "disabled",
+            state="normal",
         )
 
         self._submit_button.pack()
 
     def _deactivate_plan(self) -> Callable[[], None]:
-        print(self._plans_dropdown.state, "deactivate")
         plan = Plan.get_plan(self._plans_dropdown.state)
         if not plan:
             messagebox.showerror("Error", "Plan not found")
             return
         inactivate_subscriptions = Subscription.inactivate(plan)
-        text = Text(self._container, wrap="word", bg=Style.BG_COLOR, font=Style.FONT)
+        text = self._message
+        text.config(state="normal")
+        text.delete("1.0", "end")
+        text.insert("end", "Deactivate Plan")
         text.insert("end", f"The plan {plan.get_name()} has been deactivated")
         text.insert("end", "\n")
         text.insert("end", "Deactivated Subscriptions:")
@@ -67,8 +84,8 @@ class DeactivatePlanProcessor:
             )
             text.insert("end", "\n")
         text.pack()
-        text.config(state="disabled")
-        self._confirm.clear()
+        text.config(fg="white",state="disabled")
+        
         self._plans_dropdown.clear()
 
     def _show_informative_banner(self) -> None:
@@ -81,4 +98,4 @@ class DeactivatePlanProcessor:
             "Select the plan you want to deactivate and confirm the action",
         )
         text.pack()
-        text.config(state="disabled")
+        text.config(state="disabled", fg=Style.FG_COLOR)

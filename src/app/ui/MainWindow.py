@@ -30,8 +30,9 @@ class MainWindow(Tk):
             "You will find available processes and queries"
             " under the Processes and Queries menu"
         )
+        
 
-        text = Text(self._container, wrap="word", bg=Style.BG_COLOR, height=4, font=Style.FONT)
+        text = Text(self._container, wrap="word", bg=Style.BG_COLOR,fg=Style.FG_COLOR, height=4, font=Style.FONT)
         text.insert("1.0", initial_message)
         text.pack()
         text.config(state="disabled")
@@ -40,7 +41,7 @@ class MainWindow(Tk):
 
     def _show_user_subscription(self) -> None:
         user_subscriptions = self._user.get_subscriptions()
-        text = Text(self._container, wrap="word", bg=Style.BG_COLOR, font=Style.FONT)
+        text = Text(self._container, wrap="word", bg=Style.BG_COLOR,fg=Style.FG_COLOR, font=Style.FONT)
         text.insert("end", "Subscribed plans \n", "bold", "center")
         text.insert("end", "Plan | Status | Next charge date \n")
         text.insert("end", "-" * 50 + "\n")
@@ -58,7 +59,7 @@ class MainWindow(Tk):
 
     def _show_user_credit_cards(self) -> None:
         user_credit_cards = self._user.get_payment_methods()
-        text = Text(self._container, wrap="word", bg=Style.BG_COLOR, font=Style.FONT)
+        text = Text(self._container, wrap="word", bg=Style.BG_COLOR,fg=Style.FG_COLOR, font=Style.FONT)
         text.insert("end", "Credit cards: \n")
         text.insert("end", "-" * 50 + "\n")
         for card in user_credit_cards:

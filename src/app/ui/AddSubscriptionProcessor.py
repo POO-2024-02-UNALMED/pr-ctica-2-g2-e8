@@ -69,6 +69,7 @@ class AddSubscriptionProcessor(Frame):
         self._pan_selector = DropdownPublisher(
             self._container,
             "Select the plan you want to add",
+            
             lambda _: (
                 plan
                 for plan in plans
@@ -89,6 +90,7 @@ class AddSubscriptionProcessor(Frame):
             self._container,
             "We will charge the subscription",
             lambda _:(opt for opt in ("Yes", "No")),
+            
         )
         self._confirm.attach(EventListener(self._activate_submit_button))
         self._submit_button.pack()
@@ -107,4 +109,4 @@ class AddSubscriptionProcessor(Frame):
             "We will charge the subscription to the selected payment method.",
         )
         text.pack()
-        text.config(state="disabled")
+        text.config(state="disabled", fg=Style.FG_COLOR)

@@ -127,7 +127,7 @@ class SubscriptionPaymentProcessor(Frame):
                 bg=Style.BG_COLOR,
             ).pack()
         else:
-            Label(self._container, text="Payment has been rejected", pady=1).pack()
+            Label(self._container, text="Payment has been rejected", pady=1, fg=Style.FG_COLOR).pack()
 
         if (
             number_of_payments > 1
@@ -140,6 +140,7 @@ class SubscriptionPaymentProcessor(Frame):
                     pady=Style.GAP,
                     font=Style.FONT,
                     bg=Style.BG_COLOR,
+                    fg=Style.FG_COLOR,
                 )
                 _text.insert(
                     "end",
@@ -166,4 +167,4 @@ class SubscriptionPaymentProcessor(Frame):
             "If you select more than one payment, the total will be divided into equal parts",
         )
         text.pack()
-        text.config(state="disabled")
+        text.config(state="disabled", fg=Style.FG_COLOR)

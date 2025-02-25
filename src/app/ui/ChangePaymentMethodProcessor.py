@@ -138,4 +138,4 @@ class ChangePaymentMethodProcessor(Frame):
             "If you want to use a new credit card, select 'Add new credit card' and fill the form",
         )
         text.pack()
-        text.config(state="disabled")
+        text.config(state="disabled", fg=Style.FG_COLOR)

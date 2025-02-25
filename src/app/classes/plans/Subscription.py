@@ -167,4 +167,7 @@ class Subscription(WithId):
                     _object, Subscription.DB_PATH + os.path.sep + plan.get_name()
                 )
                 subscriptions.append(_object)
+        
+        plan.set_status(SubscriptionStatus.INACTIVE)
+        Repository.update(plan)
         return subscriptions

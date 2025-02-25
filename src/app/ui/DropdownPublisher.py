@@ -17,7 +17,7 @@ class DropdownPublisher(Subject, ttk.Combobox):
         Subject.__init__(self)
         self._get_values = get_values
         self._state: StringVar = StringVar()
-        Label(root, text=label, font=Style.FONT, bg=Style.BG_COLOR).pack(fill=X, padx=Style.GAP, pady=Style.GAP)
+        Label(root, text=label, font=Style.FONT, bg=Style.BG_COLOR, fg=Style.FG_COLOR).pack(fill=X, padx=Style.GAP, pady=Style.GAP)
         self.pack(fill=X, padx=Style.GAP, pady=Style.GAP)
         self.bind("<<ComboboxSelected>>", lambda _: self.set_state(self.get()))
 
