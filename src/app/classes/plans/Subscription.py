@@ -13,6 +13,8 @@ from typing import Final
 from datetime import datetime, timedelta, date
 import os
 
+from multimethod import multimethod
+
 
 class Subscription(WithId):
     DB_PATH: Final = "Subscriptions"
@@ -29,17 +31,10 @@ class Subscription(WithId):
         self.suspension_date: datetime = datetime.max
         self._pending_transactions: tuple[Transaction, ...] = tuple()
 
+    @multimethod
     def process_payment(
-        self, transaction: Transaction | None = None, number_of_installments: int = 1
+        self, transaction: Transaction, number_of_installments: int = 1
     ) -> Transaction:
-        if not transaction:
-            transaction = Transaction(
-                self._plan,
-                self._user,
-                self._plan.get_price(),
-                TransactionStatus.PENDING,
-                self.get_payment_methods()[0],
-            )
         GatewaysFactory.get_gateway(transaction.get_gateway()).pay(transaction)
         if (
             transaction.get_status() == TransactionStatus.ACCEPTED
@@ -62,6 +57,17 @@ class Subscription(WithId):
         )
         self._handle_installments(transaction, number_of_installments)
         return transaction
+
+    @multimethod
+    def process_payment(self, number_of_installments: int = 1) -> Transaction:
+        transaction = Transaction(
+            self._plan,
+            self._user,
+            self._plan.get_price(),
+            TransactionStatus.PENDING,
+            self.get_payment_methods()[0],
+        )
+        return self.process_payment(transaction, number_of_installments)
 
     def _handle_installments(
         self, transaction: Transaction, number_of_installments: int

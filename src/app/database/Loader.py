@@ -7,6 +7,7 @@ from app.classes.customers.User import User
 from app.classes.gateways import Gateway, IGateway
 from app.classes.gateways import GatewaysFactory, ProjectGateway
 from app.classes.plans import Subscription, Plan
+from app.classes.plans.PlanStatus import PlanStatus
 from app.database import Repository
 
 
@@ -43,18 +44,24 @@ class Loader:
     def load_data(self) -> None:
         Repository.set_debug_mode(self.debug_mode)
         Repository.create_temp_directory()
-        advanced = Plan("Advanced", "Books, Music, Videos", 500000)
-        smart = Plan("Smart", "Books, Music", 400000)
-        basic = Plan("Basic", "Videos", 300000)
-        essential = Plan("Essential", "Music", 250000)
+        advanced = Plan("Advanced", "Books, Music, Videos", 500000.0)
+        smart = Plan("Smart", "Books, Music", 400000.0)
+        basic = Plan("Basic", "Videos", 300000.0)
+        essential = Plan("Essential", "Music", 250000.0)
+        deactivated_plan = Plan(
+            "Deactivated Essential", "Music", 250000.0, PlanStatus.INACTIVE
+        )
         self.plans = [advanced, smart, basic, essential]
         Repository.save(advanced)
         Repository.save(smart)
         Repository.save(basic)
         Repository.save(essential)
+        Repository.save(deactivated_plan)
 
         Repository.save(self._admin)
-        self._admin.configure_gateway(Gateway.PROJECT_GATEWAY, "publicKey", "privateKey")
+        self._admin.configure_gateway(
+            Gateway.PROJECT_GATEWAY, "publicKey", "privateKey"
+        )
         self._gateway = GatewaysFactory.initialize_gateway(ProjectGateway())
 
         card = self._gateway.add_credit_card(

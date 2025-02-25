@@ -2,6 +2,7 @@ from tkinter import Frame, messagebox
 from app.classes.customers import User
 from app.classes.gateways import GatewaysFactory, Gateway
 from app.classes.transactions import Card
+from app.classes.exceptions import AppException
 
 from .FieldFrame import FieldFrame
 from .Input import Input
@@ -18,13 +19,16 @@ class AddCreditCardProcessor:
 
     def _add_card(self, field_frame: FieldFrame) -> Callable[[], None]:
         def _add_card() -> None:
-            card = GatewaysFactory.get_gateway(Gateway.PROJECT_GATEWAY).add_credit_card(
-                field_frame.get_value("Card Number"),
-                field_frame.get_value("Card Holder Name"),
-                field_frame.get_value("Expiration Date"),
-                field_frame.get_value("Security Code"),
-                self._user,
-            )
+            try:
+                card = GatewaysFactory.get_gateway(Gateway.PROJECT_GATEWAY).add_credit_card(
+                    field_frame.get_value("Card Number"),
+                    field_frame.get_value("Card Holder Name"),
+                    field_frame.get_value("Expiration Date"),
+                    field_frame.get_value("Security Code"),
+                    self._user,
+                )
+            except AppException:
+                return lambda: None
 
             if not card:
                 messagebox.showinfo("Error", "Credit card not added")

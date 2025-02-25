@@ -20,6 +20,14 @@ class SubscriptionPaymentProcessor(Frame):
         self._subscriptions_dropdown: DropdownPublisher | None = None
         self._payment_method_dropdown: DropdownPublisher | None = None
         self._number_of_payments_dropdown: DropdownPublisher | None = None
+        self._message: Text = Text(
+            self._container,
+            wrap="word",
+            pady=Style.GAP,
+            font=Style.FONT,
+            bg=Style.BG_COLOR,
+            fg=Style.FG_COLOR,
+        )
 
         self._show_informative_banner()
         self._show_pay_subscription_form()
@@ -117,42 +125,35 @@ class SubscriptionPaymentProcessor(Frame):
         )
         subscription.process_payment(transaction, number_of_payments)
 
+        self._message.config(state="normal")
+        self._message.delete("1.0", "end")
         if transaction.get_status() == TransactionStatus.ACCEPTED:
             plan_name = subscription.get_plan().get_name()
-            Label(
-                self._container,
-                text=f"Payment of {plan_name} has been processed",
-                pady=Style.GAP,
-                font=Style.FONT,
-                bg=Style.BG_COLOR,
-                fg=Style.FG_COLOR,
-            ).pack()
+            self._message.insert("end", f"Payment of {plan_name} has been processed \n")
         else:
-            Label(self._container, text="Payment has been rejected", pady=1, fg=Style.FG_COLOR).pack()
+            self._message.insert(
+                "end",
+                f"Payment of {subscription.get_plan().get_name()} has been scheduled \n",
+            )
 
         if (
             number_of_payments > 1
             or transaction.get_status() != TransactionStatus.ACCEPTED
         ):
+            self._message.config(state="normal")
+            self._message.delete("1.0", "end")
             for _transaction in subscription.get_pending_transactions():
-                _text = Text(
-                    self._container,
-                    wrap="word",
-                    pady=Style.GAP,
-                    font=Style.FONT,
-                    bg=Style.BG_COLOR,
-                    fg=Style.FG_COLOR,
-                )
-                _text.insert(
+                self._message.insert(
                     "end",
                     (
                         f"Next charge date: {_transaction.get_charge_date()} "
                         f"total: {_transaction.get_total()} "
-                        f"- plan: {subscription.get_plan().get_name()}"
+                        f"- plan: {subscription.get_plan().get_name()} \n"
                     ),
                 )
-                _text.pack()
+                self._message.pack()
 
+        self._message.config(state="disabled")
         self._number_of_payments_dropdown.clear()
         self._payment_method_dropdown.clear()
 

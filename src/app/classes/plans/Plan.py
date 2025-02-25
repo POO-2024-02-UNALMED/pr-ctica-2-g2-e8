@@ -6,14 +6,28 @@ from app.database import Repository
 
 from typing import cast
 
+from multimethod import multimethod
+
 
 class Plan(WithId):
+
+    @multimethod
     def __init__(self, name: str, description: str, price: float) -> None:
         super().__init__(name)
         self._name = name
         self._description = description
         self._price = price
         self._status = PlanStatus.ACTIVE
+
+    @multimethod
+    def __init__(
+        self, name: str, description: str, price: float, status: PlanStatus
+    ) -> None:
+        super().__init__(name)
+        self._name = name
+        self._description = description
+        self._price = price
+        self._status = status
 
     def get_name(self) -> str:
         return self._name
