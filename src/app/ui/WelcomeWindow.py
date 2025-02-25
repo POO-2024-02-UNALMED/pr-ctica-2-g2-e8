@@ -1,6 +1,4 @@
-import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../'))) 
 
 import tkinter as tk
 from tkinter import ttk
@@ -27,6 +25,7 @@ class WelcomeWindow:
         return os.path.join(self.IMAGES_PATH, image_name)
 
     def _open_login_window(self, event):
+        print("open login window")
         self.root.destroy()
         self._show_login_window()
 
@@ -85,9 +84,9 @@ class WelcomeWindow:
     
     def eventooo(self, event):
         self.root.destroy()
-        from src.app.App import App
-        App = App()
-        App.run()
+        #from src.app.App import App
+       #App = App()
+       #App.run()
         print("Appse")
         
 
@@ -165,7 +164,7 @@ class WelcomeWindow:
             font=("roboto", 13),
         )
         self.button2.pack(fill="both", expand=True)
-        self.button2.bind("<Button-2>", self.eventooo)
+        self.button2.bind("<Button-1>", self._open_login_window)
 
         self.label = tk.Label(
             self.frame3,

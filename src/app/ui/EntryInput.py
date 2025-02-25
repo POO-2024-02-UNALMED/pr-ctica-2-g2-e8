@@ -9,14 +9,7 @@ class EntryInPut[T](Entry):
         if input_value := input.get_initial_value():
             self.insert(0, str(input_value))
         self.config(state="disabled" if input.is_disabled() else "normal")
-        self.bind("<FocusOut>", self._on_focus_out)
-        self.bind("<Return>", self._on_return)
 
-    def _on_focus_out(self, event) -> None:
-        self._input.set_value(self.get())
-
-    def _on_return(self, event) -> None:
-        self._input.set_value(self.get())
 
     def get_value(self) -> T:
         self._input.set_value(self.get())
