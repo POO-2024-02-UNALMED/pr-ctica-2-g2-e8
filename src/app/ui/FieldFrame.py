@@ -8,13 +8,13 @@ from tkinter import Frame, Label, Button, Event, messagebox, TclError
 from typing import Final
 
 from .EntryInput import EntryInPut
-
+from .Style import Style
 
 class FieldFrame(Frame):
-    _BG_COLOR: Final = "#1d2433"
-    _FG_COLOR: Final = "#ffffff"
-    _FONT: Final = ("Helvetica", 12)
-    _GAP: Final = 5
+    _BG_COLOR: Final = Style.BG_COLOR
+    _FG_COLOR: Final = Style.FG_COLOR
+    _FONT: Final = Style.FONT
+    _GAP: Final = Style.GAP
 
     def __init__(
         self,
@@ -197,3 +197,6 @@ class FieldFrame(Frame):
         self.reset_entries()
         self._submit_button.config(state="normal")
         self._reset_button.config(state="normal")
+
+    def is_valid(self) -> bool:
+        return all(entry.is_valid() for entry in self._entries)

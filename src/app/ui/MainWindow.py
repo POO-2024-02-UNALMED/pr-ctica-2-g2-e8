@@ -12,19 +12,15 @@ from .ChangePaymentMethodProcessor import ChangePaymentMethodProcessor
 from .DeactivatePlanProcessor import DeactivatePlanProcessor
 from .Style import Style
 
-from typing import Final
-
 
 class MainWindow(Tk):
-    _BG_COLOR: Final = Style.BG_COLOR
-
     def __init__(self, user: User, callback: Callable[[None], None]) -> None:
         super().__init__()
         self._callback = callback
-        self.geometry("450x450")
+        self.geometry("450x550")
         self.title("Payment Manager")
         self._user = user
-        self._container = Frame(self, bg=MainWindow._BG_COLOR)
+        self._container = Frame(self, bg=Style.BG_COLOR)
         self.create_menu()
         self._container.pack(fill="both", expand=True)
 
@@ -35,7 +31,7 @@ class MainWindow(Tk):
             " under the Processes and Queries menu"
         )
 
-        text = Text(self._container, wrap="word", bg=MainWindow._BG_COLOR, height=4)
+        text = Text(self._container, wrap="word", bg=Style.BG_COLOR, height=4, font=Style.FONT)
         text.insert("1.0", initial_message)
         text.pack()
         text.config(state="disabled")
@@ -44,15 +40,15 @@ class MainWindow(Tk):
 
     def _show_user_subscription(self) -> None:
         user_subscriptions = self._user.get_subscriptions()
-        text = Text(self._container, wrap="word", bg=MainWindow._BG_COLOR)
-        text.insert("end", "Subscribed plans: \n")
+        text = Text(self._container, wrap="word", bg=Style.BG_COLOR, font=Style.FONT)
+        text.insert("end", "Subscribed plans \n", "bold", "center")
         text.insert("end", "Plan | Status | Next charge date \n")
         text.insert("end", "-" * 50 + "\n")
         for subs in user_subscriptions:
             text.insert(
                 "end",
                 (
-                    f"{subs.get_plan().get_name()} | {subs.get_status()} |"
+                    f"{subs.get_plan().get_name()} | {subs.get_status()} | "
                     f"{subs.get_next_charge_date().date().isoformat()}\n"
                 ),
             )
@@ -62,7 +58,7 @@ class MainWindow(Tk):
 
     def _show_user_credit_cards(self) -> None:
         user_credit_cards = self._user.get_payment_methods()
-        text = Text(self._container, wrap="word", bg=MainWindow._BG_COLOR)
+        text = Text(self._container, wrap="word", bg=Style.BG_COLOR, font=Style.FONT)
         text.insert("end", "Credit cards: \n")
         text.insert("end", "-" * 50 + "\n")
         for card in user_credit_cards:
@@ -175,12 +171,6 @@ class MainWindow(Tk):
 
     def show_pay_subscription_form(self) -> None:
         SubscriptionPaymentProcessor(self._user, self._container)
-
-    def _pay_subscription(self, subscription: str, payment_method: str) -> None:
-        messagebox.showinfo(
-            "Payment",
-            f"Subscription {subscription} has been paid using {payment_method}",
-        )
 
     def show_about_info(self) -> None:
         messagebox.showinfo(

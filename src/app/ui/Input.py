@@ -30,6 +30,7 @@ class Input[T]:
 
     def set_value(self, value: str) -> None:
         self.value = value
+        self._error = None
 
     def set_entry_ref(self, entry: Entry) -> Input:
         self._entry_ref = entry
@@ -68,6 +69,9 @@ class Input[T]:
     def is_disabled(self) -> bool:
         return self._disable
 
+    def get_error(self) -> Exception | None:
+        return self._error
+
     def _cast_to_value_type(self, value: str | None) -> TInputType:
         if not value:
             return None
@@ -92,6 +96,9 @@ class Input[T]:
         return self._cast_to_value_type(value)
 
     def clear(self) -> None:
+        if self.is_disabled():
+            return
+
         self._entry_ref.delete(0, "end")
         self._value = None
         self._error = None

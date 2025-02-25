@@ -26,7 +26,6 @@ class ChangePaymentMethodProcessor(Frame):
         for widget in self._sub_container.winfo_children():
             widget.destroy()
         self._sub_container.pack()
-        print("payment_method")
         try:
             selected_subscription = next(
                 _subscription
@@ -37,13 +36,12 @@ class ChangePaymentMethodProcessor(Frame):
             if payment_method == "Add new credit card":
                 frame = Frame(self._sub_container)
                 frame.pack()
-                add_card_processor = AddCreditCardProcessor(self._user)
+                add_card_processor = AddCreditCardProcessor(self._user, lambda: next(self._generator_ref))
                 field_frame = add_card_processor.show_add_credit_card_form(frame)
-                field_frame.get_submit_button().config(text="Validate Card")
+                field_frame.get_submit_button().config(text="Submit")
                 field_frame.pack()
                 yield None
                 selected_payment_method = add_card_processor.get_card()
-                self._add_submit_button()
             else:
                 selected_payment_method = next(
                     _payment_method
@@ -58,7 +56,6 @@ class ChangePaymentMethodProcessor(Frame):
                 "Please fill all fields",
             )
         else:
-            print("selected_subscription", "selected_payment_method")
             if not selected_payment_method:
                 messagebox.showerror(
                     "Missing Selection",
@@ -77,28 +74,34 @@ class ChangePaymentMethodProcessor(Frame):
                     "Error",
                     "Payment method not updated",
                 )
+            yield None
 
     def _show_change_payment_method_form(self) -> None:
         self._subscriptions_dropdown = DropdownPublisher(
             self._container,
-            "Select Subscription you want to update REQUIRED",
-            (_subs.get_plan().get_name() for _subs in self._user.get_subscriptions()),
+            "Select Subscription you want to update",
+            lambda _: (_subs.get_plan().get_name() for _subs in self._user.get_subscriptions()),
         )
         self._payment_method_dropdown = DropdownPublisher(
             self._container,
-            "Select the payment method you want to use REQUIRED",
-            ("Add new credit card",)
-            + tuple(
-                payment_method.get_description()
-                for payment_method in self._user.get_payment_methods()
+            "Select the payment method you want to use",
+            lambda _: (
+                "Add new credit card",
+                *(
+                    payment_method.get_description()
+                    for payment_method in self._user.get_payment_methods()
+                ),
             ),
         )
 
         self._payment_method_dropdown.attach(EventListener(self._set_generator_ref))
 
     def _set_generator_ref(self, selection: str) -> None:
-        self._generator_ref = self._handle_selection(selection)
-        return next(self._generator_ref)
+        try:
+            self._generator_ref = self._handle_selection(selection)
+            return next(self._generator_ref)
+        except StopIteration:
+            pass
 
     def _handle_submit(self) -> None:
         try:
@@ -127,7 +130,7 @@ class ChangePaymentMethodProcessor(Frame):
         self._submit_button.config(state="disabled" if is_disabled else "normal")
 
     def _show_informative_banner(self) -> None:
-        text = Text(self._container, wrap="word", bg=Style.BG_COLOR, height=4)
+        text = Text(self._container, wrap="word", bg=Style.BG_COLOR, height=4, font=Style.FONT)
         text.insert(
             "end",
             "Change Payment Method\n"

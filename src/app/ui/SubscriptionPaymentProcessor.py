@@ -56,19 +56,19 @@ class SubscriptionPaymentProcessor(Frame):
         self._subscriptions_dropdown = DropdownPublisher(
             self._container,
             "Select Subscription",
-            (_subs.get_plan().get_name() for _subs in self._subscriptions),
+            lambda _: (_subs.get_plan().get_name() for _subs in self._subscriptions),
         )
 
         self._payment_method_dropdown = DropdownPublisher(
             self._container,
             "Select the payment method",
-            (_ for _ in ()),
+            lambda _: (_ for _ in ()),
         )
 
         self._number_of_payments_dropdown = DropdownPublisher(
             self._container,
             "Number of payments",
-            (_ for _ in ()),
+            lambda _: (_ for _ in ()),
         )
 
         self._subscriptions_dropdown.attach(
@@ -122,7 +122,9 @@ class SubscriptionPaymentProcessor(Frame):
             Label(
                 self._container,
                 text=f"Payment of {plan_name} has been processed",
-                pady=1
+                pady=Style.GAP,
+                font=Style.FONT,
+                bg=Style.BG_COLOR,
             ).pack()
         else:
             Label(self._container, text="Payment has been rejected", pady=1).pack()
@@ -135,8 +137,9 @@ class SubscriptionPaymentProcessor(Frame):
                 _text = Text(
                     self._container,
                     wrap="word",
+                    pady=Style.GAP,
+                    font=Style.FONT,
                     bg=Style.BG_COLOR,
-                    height=2,
                 )
                 _text.insert(
                     "end",
@@ -146,12 +149,15 @@ class SubscriptionPaymentProcessor(Frame):
                         f"- plan: {subscription.get_plan().get_name()}"
                     ),
                 )
+                _text.pack()
 
         self._number_of_payments_dropdown.clear()
         self._payment_method_dropdown.clear()
 
     def _show_informative_banner(self) -> None:
-        text = Text(self._container, wrap="word", bg=Style.BG_COLOR, height=6)
+        text = Text(
+            self._container, wrap="word", bg=Style.BG_COLOR, height=6, font=Style.FONT
+        )
         text.insert(
             "end",
             "Pay Subscription\n"

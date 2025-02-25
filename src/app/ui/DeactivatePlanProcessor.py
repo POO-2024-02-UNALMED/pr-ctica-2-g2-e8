@@ -17,14 +17,15 @@ class DeactivatePlanProcessor:
 
     def show_form(self) -> None:
         self._show_informative_banner()
-        plans = Plan.get_all()
         self._plans_dropdown = DropdownPublisher(
             self._container,
             "Select the plan you want to deactivate",
-            (_plan.get_name() for _plan in plans),
+            lambda _: (_plan.get_name() for _plan in Plan.get_all()),
         )
 
-        deactivation_message = Text(self._container, height=2, wrap="word", bg=Style.BG_COLOR)
+        deactivation_message = Text(
+            self._container, height=2, wrap="word", bg=Style.BG_COLOR, font=Style.FONT
+        )
         deactivation_message.insert(
             "end", "Once completed the subscriptions will be inactivated automatically"
         )
@@ -34,7 +35,7 @@ class DeactivatePlanProcessor:
         self._confirm = DropdownPublisher(
             self._container,
             "Confirm?",
-            (opt for opt in ("Yes", "No")),
+            lambda _: (opt for opt in ("Yes", "No")),
         )
 
         self._confirm.attach(EventListener(self._show_submit_button))
@@ -54,10 +55,10 @@ class DeactivatePlanProcessor:
             messagebox.showerror("Error", "Plan not found")
             return
         inactivate_subscriptions = Subscription.inactivate(plan)
-        text = Text(self._container)
+        text = Text(self._container, wrap="word", bg=Style.BG_COLOR, font=Style.FONT)
         text.insert("end", f"The plan {plan.get_name()} has been deactivated")
         text.insert("end", "\n")
-        text.insert("end", "Subscriptions inactivated:")
+        text.insert("end", "Deactivated Subscriptions:")
         text.insert("end", "\n")
         for subscription in inactivate_subscriptions:
             text.insert(
@@ -71,7 +72,9 @@ class DeactivatePlanProcessor:
         self._plans_dropdown.clear()
 
     def _show_informative_banner(self) -> None:
-        text = Text(self._container, wrap="word", bg=Style.BG_COLOR, height=3)
+        text = Text(
+            self._container, wrap="word", bg=Style.BG_COLOR, height=3, font=Style.FONT
+        )
         text.insert(
             "end",
             "Deactivate Plan \n"

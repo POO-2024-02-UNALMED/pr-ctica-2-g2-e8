@@ -11,9 +11,10 @@ from collections.abc import Callable
 
 
 class AddCreditCardProcessor:
-    def __init__(self, user: User) -> None:
+    def __init__(self, user: User, on_submit: Callable[[], None] | None = None) -> None:
         self._user = user
         self._card: Card | None = None
+        self._on_submit = on_submit
 
     def _add_card(self, field_frame: FieldFrame) -> Callable[[], None]:
         def _add_card() -> None:
@@ -33,6 +34,8 @@ class AddCreditCardProcessor:
             messagebox.showinfo("Success", "Credit card added successfully")
             self._card = card
             field_frame.clear()
+            if self._on_submit:
+                self._on_submit()
 
         return _add_card
 
@@ -62,7 +65,8 @@ class AddCreditCardProcessor:
         card_holder_name = Input[str](
             "Card Holder Name",
             str,
-            _validations=(lambda x: Input.validate_len(x, 5, 50),),
+            _disable=True,
+            _value=self._user.get_email(),
         )
 
         field_frame = FieldFrame(

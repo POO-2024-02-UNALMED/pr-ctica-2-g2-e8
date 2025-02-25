@@ -16,7 +16,9 @@ class AddSubscriptionProcessor(Frame):
         self._pan_selector: DropdownPublisher | None = None
         self._payment_method_selector: DropdownPublisher | None = None
         self._confirm: DropdownPublisher | None = None
-        self._submit_button: Button = Button(self._container, text="Pay", state="disabled")
+        self._submit_button: Button = Button(
+            self._container, text="Pay", state="disabled", command=self._handle_submit
+        )
 
         self._show_informative_banner()
         self._show_add_subscription_form()
@@ -51,27 +53,33 @@ class AddSubscriptionProcessor(Frame):
             messagebox.showinfo("Error", "Select payment method")
         else:
             self._pan_selector.clear()
+            self._pan_selector.set
             self._payment_method_selector.clear()
             self._confirm.clear()
 
     def _show_add_subscription_form(self) -> None:
-        subscribed_plans = self._user.get_user_subscribed_plans()
         plans = tuple(plan.get_name() for plan in Plan.get_all())
-        available_plans = tuple(plan for plan in plans if plan not in subscribed_plans)
+        available_plans = tuple(
+            plan for plan in plans if plan not in self._user.get_user_subscribed_plans()
+        )
         if not available_plans:
             messagebox.showinfo("Add Subscription", "No available plans to subscribe")
             return
 
         self._pan_selector = DropdownPublisher(
             self._container,
-            "Select the plan you want to add REQUIRED",
-            (plan for plan in available_plans),
+            "Select the plan you want to add",
+            lambda _: (
+                plan
+                for plan in plans
+                if plan not in self._user.get_user_subscribed_plans()
+            ),
         )
 
         self._payment_method_selector = DropdownPublisher(
             self._container,
-            "Select the payment method REQUIRED",
-            (
+            "Select the payment method",
+            lambda _: (
                 payment_method.get_description()
                 for payment_method in self._user.get_payment_methods()
             ),
@@ -79,8 +87,8 @@ class AddSubscriptionProcessor(Frame):
 
         self._confirm = DropdownPublisher(
             self._container,
-            "We will charge the subscription  REQUIRED",
-            (opt for opt in ("Yes", "No")),
+            "We will charge the subscription",
+            lambda _:(opt for opt in ("Yes", "No")),
         )
         self._confirm.attach(EventListener(self._activate_submit_button))
         self._submit_button.pack()
@@ -89,7 +97,9 @@ class AddSubscriptionProcessor(Frame):
         self._submit_button.config(state="normal" if confirm == "Yes" else "disabled")
 
     def _show_informative_banner(self) -> None:
-        text = Text(self._container, wrap="word", height=4, bg=Style.BG_COLOR)
+        text = Text(
+            self._container, wrap="word", height=4, bg=Style.BG_COLOR, font=Style.FONT
+        )
         text.insert(
             "end",
             "Add Subscription\n"

@@ -23,3 +23,6 @@ class EntryInPut[T](Entry):
 
     def clear(self) -> None:
         self._input.clear()
+
+    def is_valid(self) -> bool:
+        return  self._input.get_error() is None
