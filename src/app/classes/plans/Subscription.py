@@ -114,8 +114,8 @@ class Subscription(WithId):
     def get_plan(self) -> Plan:
         return self._plan
 
-    def set_plan(self, plan: Plan):
-        self._plan = plan
+    def set_plan(self, _plan: Plan):
+        self._plan = _plan
 
     def get_next_charge_date(self):
         return self.next_charge_date
@@ -140,3 +140,31 @@ class Subscription(WithId):
 
     def get_pending_transactions(self) -> tuple[Transaction, ...]:
         return self._pending_transactions
+
+    @staticmethod
+    def get_subscriptions(plan: Plan) -> list[Subscription]:
+        with_id_list = Repository.load_all_object_in_directory(
+            plan.Subscription.DB_PATH + os.path.sep + plan.get_name()
+        )
+        return [
+            subscription
+            for subscription in with_id_list
+            if isinstance(subscription, plan.Subscription)
+        ]
+
+    @staticmethod
+    def inactivate(plan: Plan) -> list[Subscription]:
+        with_id_list = Repository.load_all_object_in_directory(
+            Subscription.DB_PATH + os.path.sep + plan.get_name()
+        )
+        subscriptions: list[Subscription] = []
+        for _object in with_id_list:
+            if isinstance(_object, Subscription):
+                _object.set_status(SubscriptionStatus.INACTIVE)
+                _object.set_suspension_date(_object.get_next_charge_date())
+                _object.set_next_charge_date(datetime.min)
+                Repository.update(
+                    _object, Subscription.DB_PATH + os.path.sep + plan.get_name()
+                )
+                subscriptions.append(_object)
+        return subscriptions

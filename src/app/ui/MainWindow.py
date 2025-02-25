@@ -9,12 +9,14 @@ from .SubscriptionPaymentProcessor import SubscriptionPaymentProcessor
 from .AddSubscriptionProcessor import AddSubscriptionProcessor
 from .AddCreditCardProcessor import AddCreditCardProcessor
 from .ChangePaymentMethodProcessor import ChangePaymentMethodProcessor
+from .DeactivatePlanProcessor import DeactivatePlanProcessor
 
 from typing import Final
 
 
 class MainWindow(Tk):
     _BG_COLOR: Final = "#1d2433"
+
     def __init__(self, user: User) -> None:
         super().__init__()
         self.geometry("450x450")
@@ -128,7 +130,9 @@ class MainWindow(Tk):
     def show_change_payment_method_form(self) -> None:
         ChangePaymentMethodProcessor(self._user, self._container)
 
-    def show_inactivate_plan_form(self) -> None: ...
+    def show_inactivate_plan_form(self) -> None:
+        DeactivatePlanProcessor(self._container).process()
+
     def show_pay_subscription_form(self) -> None:
         SubscriptionPaymentProcessor(self._user, self._container)
 

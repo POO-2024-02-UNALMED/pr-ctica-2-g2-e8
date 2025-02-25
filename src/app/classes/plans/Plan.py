@@ -1,12 +1,9 @@
 from __future__ import annotations
 
 from app.classes import WithId
-from app.classes.plans import SubscriptionStatus, Subscription
 from .PlanStatus import PlanStatus
 from app.database import Repository
 
-from datetime import datetime
-import os
 from typing import cast
 
 
@@ -31,9 +28,9 @@ class Plan(WithId):
     def get_all() -> list[Plan]:
         with_id_list = Repository.load_all_object_in_directory("Plan")
         return [
-            plan
-            for plan in with_id_list
-            if isinstance(plan, Plan) and plan.get_status() == PlanStatus.ACTIVE
+            _plan
+            for _plan in with_id_list
+            if isinstance(_plan, Plan) and _plan.get_status() == PlanStatus.ACTIVE
         ]
 
     @staticmethod
@@ -44,34 +41,6 @@ class Plan(WithId):
             for plan in with_id_list
             if isinstance(plan, Plan) and plan.get_status() == PlanStatus.INACTIVE
         ]
-
-    @staticmethod
-    def get_subscriptions(plan) -> list[Subscription]:
-        with_id_list = Repository.load_all_object_in_directory(
-            Subscription.DB_PATH + os.path.sep + plan.get_name()
-        )
-        return [
-            subscription
-            for subscription in with_id_list
-            if isinstance(subscription, Subscription)
-        ]
-
-    @staticmethod
-    def inactivate_subscriptions(plan) -> list[Subscription]:
-        with_id_list = Repository.load_all_object_in_directory(
-            Subscription.DB_PATH + os.path.sep + plan.get_name()
-        )
-        subscriptions: list[Subscription] = []
-        for _object in with_id_list:
-            if isinstance(_object, Subscription):
-                _object.set_status(SubscriptionStatus.INACTIVE)
-                _object.set_suspension_date(_object.get_next_charge_date())
-                _object.set_next_charge_date(datetime.MIN)
-                Repository.update(
-                    _object, Subscription.DB_PATH + os.path.sep + plan.get_name()
-                )
-                subscriptions.append(_object)
-        return subscriptions
 
     @staticmethod
     def get_plan(name) -> Plan | None:

@@ -1,0 +1,69 @@
+from app.classes.plans import Plan, Subscription
+from app.ui.DropdownPublisher import DropdownPublisher
+from tkinter import Button, Text, messagebox, Misc
+
+from .EventListener import EventListener
+
+from collections.abc import Callable
+
+
+class DeactivatePlanProcessor:
+    def __init__(self, container: Misc) -> None:
+        self._plans_dropdown: DropdownPublisher | None = None
+        self._confirm: DropdownPublisher | None = None
+        self._container: Misc = container
+        self._submit_button: Button = Button(self._container, text="Deactivate")
+
+    def process(self) -> None:
+        plans = Plan.get_all()
+        self._plans_dropdown = DropdownPublisher(
+            self._container,
+            "Select the plan you want to deactivate",
+            (_plan.get_name() for _plan in plans),
+        )
+
+        deactivation_message = Text(self._container, height=2)
+        deactivation_message.insert(
+            "end", "Once completed the subscriptions will be inactivated automatically"
+        )
+        deactivation_message.pack()
+        deactivation_message.config(state="disabled")
+
+        self._confirm = DropdownPublisher(
+            self._container,
+            "Confirm?",
+            (opt for opt in ("Yes", "No")),
+        )
+
+        self._confirm.attach(EventListener(self._show_submit_button))
+
+    def _show_submit_button(self, confirmation: str) -> None:
+        self._submit_button.config(
+            command=self._deactivate,
+            state="normal" if confirmation == "Yes" else "disabled",
+        )
+
+        self._submit_button.pack()
+
+    def _deactivate(self) -> Callable[[], None]:
+        print(self._plans_dropdown.state, "deactivate")
+        plan = Plan.get_plan(self._plans_dropdown.state)
+        if not plan:
+            messagebox.showerror("Error", "Plan not found")
+            return
+        inactivate_subscriptions = Subscription.inactivate(plan)
+        text = Text(self._container)
+        text.insert("end", f"The plan {plan.get_name()} has been deactivated")
+        text.insert("end", "\n")
+        text.insert("end", "Subscriptions inactivated:")
+        text.insert("end", "\n")
+        for subscription in inactivate_subscriptions:
+            text.insert(
+                "end",
+                f"Subscription {subscription.get_plan().get_name()} - {subscription.get_user().get_email()}",
+            )
+            text.insert("end", "\n")
+        text.pack()
+        text.config(state="disabled")
+        self._confirm.clear()
+        self._plans_dropdown.clear()
