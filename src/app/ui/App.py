@@ -27,7 +27,7 @@ class App:
 
     def _show_login_window(self) -> None:
         window = Tk()
-        window.geometry("400x400")
+        window.geometry("300x270")
         window.title("Login")
         user_name = Input[str]("UserName", str)
         password = Input[str]("Password", str)

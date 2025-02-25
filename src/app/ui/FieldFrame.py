@@ -12,6 +12,7 @@ from .EntryInput import EntryInPut
 
 class FieldFrame(Frame):
     _BG_COLOR: Final = "#1d2433"
+    _FG_COLOR: Final = "#ffffff"
     _FONT: Final = ("Helvetica", 12)
     _GAP: Final = 5
 
@@ -25,7 +26,8 @@ class FieldFrame(Frame):
         inputs: tuple[Input, ...],
     ) -> None:
         super().__init__(
-            master, bg=FieldFrame._BG_COLOR, bd=1, relief="solid", padx=10, pady=10
+            master, bg=FieldFrame._BG_COLOR,bd=1, relief="solid", padx=10, pady=10
+            
         )
         self._criteria_title = criteria_title
         self._inputs_title = inputs_title
@@ -42,7 +44,7 @@ class FieldFrame(Frame):
         except TclError:
             pass
 
-        Label(self, text=title, bg=FieldFrame._BG_COLOR, font=FieldFrame._FONT).grid(
+        Label(self, text=title, bg=FieldFrame._BG_COLOR, fg=FieldFrame._FG_COLOR ,font=FieldFrame._FONT).grid(
             row=0,
             column=0,
             columnspan=2,
@@ -56,6 +58,7 @@ class FieldFrame(Frame):
             bg=FieldFrame._BG_COLOR,
             font=FieldFrame._FONT,
             pady=30,
+            fg=FieldFrame._FG_COLOR,
         ).grid(
             row=1,
             column=0,
@@ -73,6 +76,7 @@ class FieldFrame(Frame):
             text=self._criteria_title,
             bg=FieldFrame._BG_COLOR,
             font=FieldFrame._FONT,
+            fg=FieldFrame._FG_COLOR,
         ).grid(
             row=0,
             column=0,
@@ -86,6 +90,7 @@ class FieldFrame(Frame):
             text=self._inputs_title,
             bg=FieldFrame._BG_COLOR,
             font=FieldFrame._FONT,
+            fg=FieldFrame._FG_COLOR,
         ).grid(
             row=1,
             column=0,
@@ -101,6 +106,7 @@ class FieldFrame(Frame):
                 text=input.get_label(),
                 bg=FieldFrame._BG_COLOR,
                 font=FieldFrame._FONT,
+                fg=FieldFrame._FG_COLOR,
             ).grid(
                 row=i + 2,
                 column=0,
@@ -116,6 +122,7 @@ class FieldFrame(Frame):
                 sticky="nsew",
                 pady=FieldFrame._GAP,
                 padx=FieldFrame._GAP,
+                
             )
             self._entries.append(entry)
 

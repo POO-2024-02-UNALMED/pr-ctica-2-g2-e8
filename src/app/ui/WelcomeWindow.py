@@ -12,7 +12,7 @@ class WelcomeWindow:
         self.root = tk.Tk()
         self.root.title("Payment Manager")
         self.root.geometry("525x450")
-        self.root.configure(bg="#4682B4")
+        self.root.configure(bg="#1d2433")
         self._container = ttk.Frame(self.root)
         self.count = 0
         self.count2 = 0
@@ -50,7 +50,7 @@ class WelcomeWindow:
         if self.count == 0:
             self.button.config(
                 text="Yeison Andrey Liscano Ceballes\n23 Años\nCiencias De La Computacion",
-                bg="blue",
+                bg="#b36af7",
             )
             self.image.config(file=self.get_image_path("yeison_liscano.png"))
             self.image2.config(file=self.get_image_path("yeison_liscano_2.png"))
@@ -59,7 +59,7 @@ class WelcomeWindow:
             self.count = 1
         elif self.count == 1:
             self.button.config(
-                text="Juan Pablo Angel Zuleta\n19 Años\nIngenieria de sistemas", bg="red"
+                text="Juan Pablo Angel Zuleta\n19 Años\nIngenieria de sistemas", bg="#b36af7"
             )
             self.image.config(file=self.get_image_path("juan_angel_1.png"))
             self.image2.config(file=self.get_image_path("juan_angel_2.png"))
@@ -69,7 +69,7 @@ class WelcomeWindow:
         elif self.count == 2:
             self.button.config(
                 text="Oscar Fabian Rojas Baquero\n19 años\nciencias De La Computacion\nMaestro pokemon",
-                bg="gray",
+                bg="#b36af7",
             )
             self.image.config(file=self.get_image_path("Oscar1.png"))
             self.image2.config(file=self.get_image_path("Oscar2.png"))
@@ -114,7 +114,7 @@ class WelcomeWindow:
         textt.config(state="disabled")
         textt.pack(fill="both", expand=True)
 
-        button10 = tk.Button(self.root, text="Cerrar Descripcion", bg="blue")
+        button10 = tk.Button(self.root, text="Cerrar Descripcion", bg="#b36af7")
         button10.place(relx=0.8, rely=0.95, anchor="center")
         button10.bind("<Button-1>", lambda event: self.des(event, frame10, button10))
 
@@ -149,7 +149,7 @@ class WelcomeWindow:
         self.button = tk.Button(
             self.frame4,
             text="Oscar Fabian Rojas Baquero\n19 años\nciencias de la computacion\nMaestro pokemon",
-            bg="gray",
+            bg="#b36af7",
             fg="white",
             font=("roboto", 10),
         )
@@ -159,7 +159,7 @@ class WelcomeWindow:
         self.button2 = tk.Button(
             self.frame5,
             text="Da clik\npara ingreasar al sistema",
-            bg="#5F9EA0",
+            bg="#b36af7",
             fg="black",
             font=("roboto", 13),
         )
